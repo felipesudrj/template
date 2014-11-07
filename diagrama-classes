@@ -1,0 +1,84 @@
+
+**********************************************
+
+Class Page
+	+index (redirecionar conforme nivel de acesso)
+	+administrador
+	+tecnico
+	
+
+Class atendimento
+
+	+importar (importar os)
+
+	+agendar  (agendar os)
+	+atribuir (atribuir os ao técnico)
+	+listar   (visualizar todas as OS)
+	+visualizar (Visualizar dados da os)
+	
+	+alterar  (alterar os)
+	+excluir   (excluir os)	
+
+
+	+rat	 (Relatório de atendimento técnico)
+	+ajaxIncluirItemRat (items cadastrados durante o atendimento)
+	+ajaxRemoverItemRat (items cadastrados durante o atendimento)
+
+
+
+
+	+finaliza (finalizar OS)
+
+
+
+	
+
+Class Relatorio
+	+atendimento
+	+estoque
+
+Class Estoque
+	+cadastrar
+	+listar
+	+editar
+	+relatorio
+
+Class tecnico
+	+cadastro
+ 	+Editar
+	+listar
+
+
+
+
+Dados de importação de OS
+
+
+Numero da OS
+Contrato
+Nome
+Logradouro
+Numero
+Complemento
+Bairro
+Cidade
+UF
+Area
+Fone1, Fone2, Fone3
+RET
+Status
+Data
+Periodo
+Tipo de servico
+Tipo
+POntos
+Observacoes
+Quantidade
+
++Agendamento(importacao_id,data_agendamento,Contato,Observacoes)
+
++atribuicao(importacao_id,data_execucao,tecnico_id,observacoes,data_atribuicao)		
+
++RAT(importacao_id,observacoes,observacoes) 
+
++ItemRat(rat_id,modelo_id,numero_serie,numero_cartao)
