@@ -1,0 +1,65 @@
+
+Class Page
+	+index (redirecionar conforme nivel de acesso)
+	+administrador
+	+tecnico
+	
+
+Class atendimento
+
+	+importar (importar os)
+
+	+agendar  (agendar os)
+	+atribuir (atribuir os ao técnico)
+	+listar   (visualizar todas as OS)
+	+visualizar (Visualizar dados da os)
+	
+	+alterar  (alterar os)
+	+excluir   (excluir os)	
+
+
+	+rat	 (Relatório de atendimento técnico)
+	+ajaxIncluirItemRat (items cadastrados durante o atendimento)
+	+ajaxRemoverItemRat (items cadastrados durante o atendimento)
+
+
+
+
+	+finaliza (finalizar OS)
+
+
+
+	
+
+Class Relatorio
+	+atendimento
+	+estoque
+
+Class Estoque
+	+MateriaisEmTransito
+	+cadastrar
+	+listar
+	+editar
+	+relatorio
+
+Class tecnico
+	+cadastro
+ 	+Editar
+	+listar
+
+
++Atendimento(atendimento_id,outros campos da OS)
+
++Agendamento(importacao_id,data_agendamento,Contato,Observacoes)
+
++atribuicao(importacao_id,data_execucao,tecnico_id,observacoes,data_atribuicao)		
+
++RAT(atendimento_id,observacoes,nrdRat) 
+
++ItemRat(item_rat_id,nrdRat,tipo_material_id,tipo_material_id,numero_serie,numero_cartao,observacoes)
+
++TipoMaterial(tipo_material_id,nome,observacoes)
+
++atributoMaterial(tipo_material_id, numero_serie, numero_equipamento,observacoes,status_utilizacao)
+
++MateriaisEmTransito(tipo_material_id, tecnico_id, atendimento_id, data_retirada, data_uso,observacoes)
