@@ -17,11 +17,23 @@ class AtendimentoController extends AppController {
 
     public $uses = array(
         'Atendimento', 'TipoServico', 'StatusAtendimento',
-        'Agendamento', 'Atribuicao', 'Tecnico','MaterialDistribuido');
+        'Agendamento', 'Atribuicao', 'Tecnico','MaterialDistribuido','MaterialUtilizado');
 
     
     public function index() {
         
+    }
+
+	public function alterar($atendimento_id) {
+        $atendimento = $this->Atendimento->findByatendimento_id($atendimento_id);
+        $this->request->data = $atendimento;
+        $tipoServico = $this->TipoServico->find('list', array('fields' => array('tipo_servico_id', 'descricao')));
+        $statusAtendimento = $this->StatusAtendimento->find('list', array('fields' => array('status_atendimento_id', 'descricao')));
+        $tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
+
+		
+
+        $this->set(compact('atendimento', 'tipoServico', 'statusAtendimento', 'tecnicos'));
     }
 
     public function ajaxEditarAtendimento() {
@@ -220,27 +232,77 @@ class AtendimentoController extends AppController {
         }
     }
 
-    public function editar() {
-        $dados['Status'] = 'confirma';
-        pr($this->request->data);
-        echo json_encode($dados);
-        die;
-    }
-
-    public function rat() {
-        
-    }
-
-    public function alterar($atendimento_id) {
-        $atendimento = $this->Atendimento->findByatendimento_id($atendimento_id);
-        $this->request->data = $atendimento;
-        $tipoServico = $this->TipoServico->find('list', array('fields' => array('tipo_servico_id', 'descricao')));
-        $statusAtendimento = $this->StatusAtendimento->find('list', array('fields' => array('status_atendimento_id', 'descricao')));
-        $tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
-
-
-        $this->set(compact('atendimento', 'tipoServico', 'statusAtendimento', 'tecnicos'));
-    }
+    public function ajaxRat(){
+		
+		$transaction = $this->Rat->getDataSource();
+		$dados = $this->Session->read('itens');
+		/*observacoes,numerorat,itens*/
+		$form = $this->request->data;
+		$update['Atendimento']['atendimento_id'] = $form['Rat']['atendimento_id'];
+		$update['Atendimento']['status_atendimento_id'] = '4';
+		
+				
+		$Atribuicao = $this->Atribuicao->find('first',array('conditions'=>array('Rat.atendimento_id'=>$atendimento_id)));
+		
+		
+		/*VERIFICAR RAT É DO TÉCNICO OU O ADMINISTRADOR ESTA ATUANDO NA RAT */
+		if($this->Auth->user('tipo_usuario_id')=='1' || $Atribuicao['Atribuicao']['tecnico_id'] == $this->Auth->user('tecnico_id')){
+		
+				/* VALIDAR PREENCHIMENTO DO CODIGO DA RAT */
+				$this->Rat->set($this->request->data);
+		
+		if($this->Rat->validates()){
+						
+						$transaction->begin();
+							try{
+								/**SALVAR TODOS OS ITENS + NR RAT + DESCRICAO */
+								foreach($dados as $indice=>$content){
+									
+									$dados[$indice] = $form['Rat'];
+									$this->MateriaisUtilizado->save($dados);
+									
+									/* SUBTRAIR O TOTAL DE DISTRIBUIDOS CONFORME A QUANTIDADE UTILIZADA */
+									
+								}
+								
+								$this->Atendimento->save($update);
+								
+								
+								
+								$transaction->commit();
+								$retorno = array('msg'=>'Relatório técnico gravado com sucesso','titulo'=>'Sucesso','tipo'=>'success');
+								echo json_encode($retorno);
+								die;
+								
+							}catch (Exception $e) {
+							
+								$transaction->rollback();
+								$msg = "Ocorreu um erro ao realizar essa operação".$e->getMessage();
+								$retorno = array('msg'=>$msg,'titulo'=>'Erro','tipo'=>'error');
+								echo json_encode($retorno);
+								die;
+								
+							}
+				}else{
+				
+					$msg = "O preenchimento do número da RAT é obirgatório";
+					$retorno = array('msg'=>$msg,'titulo'=>'Erro','tipo'=>'error');
+					echo json_encode($retorno);
+					die;
+				
+				}
+				
+		
+		}else{
+		
+		
+			$msg = "Essa atividade não foi atribuida ao seu perfil";
+			$retorno = array('msg'=>$msg,'titulo'=>'Erro','tipo'=>'error');
+			echo json_encode($retorno);
+			die;
+		}
+		
+}
 
     public function ajaxAtribuir() {
 
@@ -265,6 +327,8 @@ class AtendimentoController extends AppController {
                     $this->Atribuicao->saveAll($dados);
                     /* ALTERAR STATUS */
                     $this->Atendimento->save($update);
+					
+					
                     $dataSource->commit();
 
                     $retorno = array('msg' => 'Atribuição realiza com sucesso', 'titulo' => 'Sucesso', 'tipo' => 'success');
@@ -293,16 +357,82 @@ class AtendimentoController extends AppController {
         }
     }
 
-    public function finaliza() {
-        
-    }
-
+  	public function ajaxVisualizaTabelaItens(){
+			$this->layout = null;
+			$itensSalvos = $this->Session->read('itens');
+			$this->set('itens',$itensSalvos);
+		}
+	
     public function ajaxIncluirItemRat() {
-        
+			
+			$this->layout = null;
+		
+			if($this->request->is('post')){
+					
+					
+			
+					if(isset($this->Session->read('itens'))){
+					
+							$dados = array('material_id'=>$_post['material_id'],'descricao'=>$_post['descricao'],'quantidade'=>$_post['quantidade'],'informacoes'=>$_post['informacoes']);
+							$novoItem[] = $this->Session->read('itens')
+							$novoItem[] = $dados;
+							$itens = $this->Session->write('itens',$novoItem);
+						}else{
+							$dados['0']['material_id'] = $_post['material_id'];
+							$dados['0']['quantidade'] = $_post['quantidade'];
+							$dados['0']['informacoes'] = $_post['informacoes'];
+							$dados['0']['descricao'] = $_post['descricao'];
+							$novoItem = $this->Session->write('itens',$dados);
+					}
+			
+				
+				
+			}
     }
 
-    public function ajaxRemoverItemRat() {
+    public function ajaxRemoverItemRat($indice) {
         
+		$dados = $this->Session->read('itens');
+		unset($dados[$indice]);
+		$this->Session->write('itens',$dados);
+		die;
+		
     }
+
+	public function ajaxMostrarMateriaisDoTecnico($atendimento_id){
+	
+		
+		$atendimento = $this->Atendimento->findByatendimento_id($atendimento_id);
+		$materiais = $this->MaterialDistribuido->find('list',array(
+														'conditions'=>array('MaterialDistribuido.tecnico_id'=>$atendimento['Atendimento']['tecnico_id']),
+														'fields'=>array('MaterialDistribuido.material_id','Material.descricao')
+																	)
+																);
+		$this->set('materiais'=>$materiais);
+		
+		
+	
+	}
+	
+	public function ajaxVisualizaItensRat(){
+			$this->layout = null;
+			$atendimento_id = $_post['atendimento_id'];
+			$itensSalvos = $this->MaterialUtilizado->findByatendimento_id($atendimento_id);
+			$this->set('itens',$itensSalvos);
+	}
+	
+	public function ajaxFinalizar(){
+		
+			$dados = $this->request->data;
+			$update['Atendimento']['atendimento_id'] = $dados['Agendamento']['atendimento_id'];
+			$update['Atendimento']['status_atendimento_id'] = '6';
+			
+			$tecnico_id = $this->Atendimento->findByatendimento_id($dados['Agendamento']['atendimento_id']);
+			$itensUsados = $this->MaterialUtilizado->findByatendimento_id($dados['Agendamento']['atendimento_id']);
+			
+			/* Chamar função na controller estoque e subtrair valor de total de materiais utilizados */
+			/* na tabela totalMaterial subtrair o total de material conforme o valor já encontrado dentro da tabela */ 
+			
+	}
 
 }
