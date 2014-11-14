@@ -9,24 +9,14 @@
 App::uses('AppController', 'Controller');
 
 /**
- * CakePHP EstoqueController
+ * CakePHP RelatorioController
  * @author felipe
  */
-class EstoqueController extends AppController {
+class RelatorioController extends AppController {
 
-    public function cadastrar() {
+    public function atendimento() {
         
     }
+    public function estoque(){}
 
-    public function listar() {
-        
-    }
-    
-    public function editar() {
-        
-    }
-    
-    public function excluir() {
-        
-    }
 }
