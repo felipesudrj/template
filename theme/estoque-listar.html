@@ -241,6 +241,8 @@
 							</div>
 						</div> <!-- /.form-group -->
 						
+						
+						
 						<div class="form-group">
 							
 							<div class="col-md-8">
@@ -258,7 +260,7 @@
 
             <div class="widget-header">
               <i class="icon-list"></i>
-              <h3>Listagem de técnicos</h3>
+              <h3>Relatório de materiais</h3>
             </div> <!-- /.widget-header -->
 
 			 <div class="widget-content">
@@ -268,9 +270,9 @@
 					<table class="table table-bordered table-hover table-striped">
 					        <thead>
 					          <tr>
-					            <th>Nr. Matrícula</th>
-					            <th>Nome Tecnico</th>
-					            <th>Telefone</th>
+					            <th>Nome do material</th>
+					            <th>Quantidade total em estoque</th>
+					            
 							
 					            
 								<th>Ações</th>
@@ -281,7 +283,7 @@
 							<tr>
 							<td><?php echo $valor['Tecnico']['matricula'];?></td>
 							<td><?php echo $valor['Tecnico']['nome'];?></td>
-							<td><?php echo $valor['Tecnico']['celular'];?></td>
+							
 							
 							
 							<td>
@@ -292,7 +294,7 @@
 							</tr>
 							<?php } ?>
 							<tr>
-							<td>88899</td>
+							
 							<td>Felipe Oliveira</td>
 							<td>47-33553322</td>
 							
