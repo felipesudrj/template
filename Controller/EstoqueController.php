@@ -13,18 +13,38 @@ App::uses('AppController', 'Controller');
  * @author felipe
  */
 class EstoqueController extends AppController {
+	 public $uses = array(
+        'Atendimento', 'Material','MaterialDistribuido','MaterialUtilizado','TotalMaterial');
 
-    public function cadastrar() {
+	public function atualizarnumeros($material_id,$quantidade,$operacao,$tecnico_id){
+	
+			$total = $this->TotalMaterial->find('first',array(
+												'fields'=>array('quantidade','material_id','total_material_id'),
+												'conditions'=>array('tecnico_id'=>$tecnico_id,'material_id'=>$material_id),
+												'group'=>array('material_id','tecnico_id')
+												));
+												
+			if($operacao=='1'){
+				$total['TotalMaterial']['quantidade'] = $total['TotalMaterial']['quantidade'] + $quantidade;
+			}else{
+				$total['TotalMaterial']['quantidade'] = $total['TotalMaterial']['quantidade'] - $quantidade;
+			}
+			
+			$this->TotalMaterial->save($total);
+	
+	}
+
+    public function cadastrarmaterial() {
         
+		$UnidadeMedidas = $this->UnidadeMedida->find('list',array('fields'=>array('unidade_medida_id','descricao')));
+		
     }
 
-    public function listar() {
+    public function listarmaterial() {
         
     }
     
-    public function editar() {
-        
-    }
+	public function distribuir(){}
     
     public function excluir() {
         
