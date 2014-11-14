@@ -204,6 +204,56 @@
       	
       	<div class="col-md-12">      		
       		
+			<?php 
+			$msg = $this->Session->flash('confirmar'); if($msg){?>
+			<div class="alert alert-success alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+              <strong>OK:</strong> <?php echo $msg;?>.
+            </div>
+			<?php } ?>
+			
+			
+			
+			<?php 
+			$msg = $this->Session->flash('negar'); if($msg){?>
+			<div class="alert alert-danger alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+              <strong>Erro:</strong> <?php echo $msg;?>.
+            </div>
+			<?php } ?>
+			
+			<div class="widget stacked ">
+
+            <div class="widget-header">
+              <i class="icon-filter"></i>
+              <h3>Filtrar</h3>
+            </div> <!-- /.widget-header -->
+
+			 <div class="widget-content">
+				
+				<form action="/" role="form" class="form-horizontal col-md-7">
+
+
+						<div class="form-group">
+							<label class="col-md-4">Nome do material</label>
+							<div class="col-md-8">
+								<input type="text" name="material.nome" value="" class="form-control" />
+							</div>
+						</div> <!-- /.form-group -->
+						
+						<div class="form-group">
+							
+							<div class="col-md-8">
+								<input type="submit" name="input1" value="Buscar" class="btn btn-success" />
+							</div>
+						</div> <!-- /.form-group -->
+						</form>
+			
+			 </div>
+			</div>
+			
+			
+			
       		<div class="widget stacked ">
 
             <div class="widget-header">
@@ -221,22 +271,35 @@
 					            <th>Nr. Matrícula</th>
 					            <th>Nome Tecnico</th>
 					            <th>Telefone</th>
-								<th>Celular</th>
-					            <th>Status</th>
+							
+					            
 								<th>Ações</th>
 					          </tr>
 					        </thead>
 					        <tbody>
-					        <tr>
+					        <?php foreach($tecnicos as $indice=>$valor){ ?>
+							<tr>
+							<td><?php echo $valor['Tecnico']['matricula'];?></td>
+							<td><?php echo $valor['Tecnico']['nome'];?></td>
+							<td><?php echo $valor['Tecnico']['celular'];?></td>
+							
+							
+							<td>
+								<a href="/tecnico/cadastrar/<?php echo $valor['Usuario']['usuario_id'];?>" class="label label-success"><i class="icon-search"></i> Editar</a>
+								<a href="/tecnico/excluir/<?php echo $valor['Usuario']['usuario_id'];?>" class="label label-danger"><i class="icon-remove"></i> Excluir</a>
+								
+							</td>
+							</tr>
+							<?php } ?>
+							<tr>
 							<td>88899</td>
 							<td>Felipe Oliveira</td>
 							<td>47-33553322</td>
-							<td>47-9988855</td>
-							<td>Ativo</td>
+							
+							
 							<td>
-								<a href="/tecnico/editar/matricula" class="label label-success"><i class="icon-edit"></i> Editar</a>
-								<a href="#visualizar"  onclick="getFuncionario('23')" data-toggle="modal" class="label label-warning"><i class="icon-search"></i> Visualizar</a>
-								
+								<a href="/tecnico/cadastrar/ID" class="label label-success"><i class="icon-search"></i> Editar</a>
+								<a href="/tecnico/excluir/ID" class="label label-danger"><i class="icon-remove"></i> Excluir</a>
 							</td>
 							</tr>
 					        </tbody>
