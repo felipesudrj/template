@@ -226,7 +226,7 @@
 						<a href="#agendamento" data-toggle="tab">Agendamento</a>
 					</li>
 					  <li class="atribuicao"><a href="#atribuicao" data-toggle="tab">Atribuição</a></li>
-					  <li class="rat"><a href="#rat" data-toggle="tab">RAT</a></li>
+					  <li class="rat"><a href="#rat" id="carregarMateriaisTecnico" data-toggle="tab">RAT</a></li>
 					  
 					   <li class="finalizar"><a href="#finalizar" data-toggle="tab">Finalizar</a></li>
 					</ul>
@@ -445,61 +445,70 @@
 							</div>
 							
 							<div class="tab-pane" id="rat">
-								<form id="form-rat" class="form-horizontal col-md-12">
+								
 									<fieldset>
 										
+										<div id="MostrarMateriaisDoTecnico" class="form-horizontal col-md-12">
+										<!-- LISTAR MATERIAIS QUE O TECNICO POSSUI - INICIO -->
 										<div class="form-group">
-										<label for="modelo" class="col-lg-4">Modelo do decodificador</label>
+										<label for="modelo" class="col-lg-4">Tipo de Material</label>
 											<div class="col-md-8">
-											  <select id="modeloid"  name="validateSelect" class="form-control">
-												<option value="">Select...</option>
-												<option value="1">TDR558-85</option>
-												<option value="2">TDR223</option>
-												<option value="3">TDR587</option>
+											
+											  <select id="materialTipo"  name="material_id" class="form-control">
+												<?php foreach($materiais as $indMat=>$valMat){?>
+													<option value="<?php echo $valMat['MaterialDistribuido']['material_id'];?>"><?php echo $valMat['Material']['descricao'];?></option>
+												<?php } ?>
 											  </select>
 											</div>
 										</div>	
 										
 										<div class="form-group">
-										<label for="numeroserie"  class="col-lg-4">Número de série</label>
+										<label for="numeroserie"  class="col-lg-4">Quantidade</label>
 											<div class="col-md-8">
-											  <input type="text" class="form-control" id="numeroserie" value="">
+											  <input type="text" name="quantidade" class="form-control" id="materialQuantidade" value="">
 											</div>
 										</div>
 										
-										
 										<div class="form-group">
-										<label for="numeroserie" class="col-lg-4">Número do cartão</label>
+										<label for="numeroserie" class="col-lg-4">Outras Informações</label>
 											<div class="col-md-8">
-											  <input type="text" class="form-control" id="numerocartao" value="">
+											  <input type="text"  name="informacoes" class="form-control" id="materialInformacoes" value="">
 											</div>
 										</div>
 										
 										<div class="form-group">
 										<input type="button" class="btn btn-default pull-right" value="Incluir" onclick="incluiritemrat();">
 										</div>
-										<hr>
 										
+										<hr>
+										<!-- LISTAR MATERIAIS QUE O TECNICO POSSUI - FIM -->
+										</div>
+										
+										
+										<div id="visualizaTabelaItens" class="form-horizontal col-md-12">
+										<!--ELEMENTOS SALVOS NA SESSAO - INICIO ajaxIncluirItemRat -->
 										<div class="form-group">
 										<table class="table table-bordered table-hover table-striped">
 												<thead>
 												  <tr>
 													<th>#</th>
 													<th>Modelo</th>
-													<th>Nº Série</th>
-													<th>Nº Cartão</th>
+													<th>Quantidade</th>
+													<th>Informações</th>
 													<th>Excluir</th>
 												  </tr>
 												</thead>
 												<tbody>
 												  
+												  <?php foreach($itens as $indice=>$mat){?>
 												  <tr>
-													<td>2</td>
-													<td>Jacob</td>
-													<td>Thornton</td>
-													<td>@fat</td>
-													<td><a href="/atendimento/itemrat/remove/numeroitem">Remover</a></td>
+													<td><?php echo $indice; ?></td>
+													<td><?php echo $mat['descricao']; ?></td>
+													<td><?php echo $mat['quantidade']; ?></td>
+													<td><?php echo $mat['informacoes']; ?></td>
+													<td><a href="" onclick="removeitemrat('<?php echo $indice; ?>')">Remover</a></td>
 												  </tr>
+												  <?php } ?>
 												  <tr>
 													<td>3</td>
 													<td>3</td>
@@ -510,23 +519,26 @@
 												</tbody>
 										</table>
 										</div>
-										
-									
-
-									<div class="form-group">
-										<label for="message" class="col-lg-4">Observações</label>
-										  <div class="col-md-8">
-											<textarea class="form-control" name="message" id="observacoes-rat" rows="4"></textarea>
-											</div>
+										<!--ELEMENTOS SALVOS NA SESSAO - FIM -->
 										</div>
 									
+										<form id="form-rat" class="form-horizontal col-md-12">
 										<div class="form-group">
-											<div class="col-md-offset-4 col-md-8">
-												<button type="button" class="btn btn-primary" onclick="rat()">Salvar</button> <a href="/" class="btn btn-default">Cancel</a>
+											<label for="message" class="col-lg-4">Observações</label>
+											  <div class="col-md-8">
+											  <input type="text" value="numeroos" name="numeroos" class="form-control" />
+												<input type="text" value="2" name="atendimento_id" class="form-control" />
+												<textarea class="form-control" name="observacoes" id="observacoes-rat" rows="4"></textarea>
+												</div>
 											</div>
-										</div>
-									</fieldset>
-								</form>
+										
+											<div class="form-group">
+												<div class="col-md-offset-4 col-md-8">
+													<button type="button" class="btn btn-primary" onclick="rat()">Salvar</button> <a href="/" class="btn btn-default">Cancel</a>
+												</div>
+											</div>
+										</fieldset>
+										</form>
 							</div>
 							
 							<div class="tab-pane" id="finalizar">
@@ -535,37 +547,42 @@
 										
 										
 										<div class="form-group">
-										<label>
-										Equipamento utilizado.
-										</label>
+										<div id="VisualizaItensRat" class="form-horizontal col-md-12">
+										<!--ELEMENTOS SALVOS NA SESSAO - INICIO ajaxIncluirItemRat -->
+										<div class="form-group">
 										<table class="table table-bordered table-hover table-striped">
-					        <thead>
-					          <tr>
-					            <th>#</th>
-					            <th>Modelo</th>
-					            <th>Nº Série</th>
-					            <th>Nº Cartão</th>
-								<th>Técnico</th>
-					          </tr>
-					        </thead>
-					        <tbody>
-					          
-					          <tr>
-					            <td>2</td>
-					            <td>Jacob</td>
-					            <td>Thornton</td>
-					            <td>@fat</td>
-								<td>Joan</td>
-					          </tr>
-					         
-					            <td>3</td>
-								<td>3</td>
-					            <td>Larry the Bird</td>
-					            <td>@twitter</td>
-								<td><a href="/atendimento/itemrat/remove/numeroitem">Remover</a></td>
-					          </tr>
-					        </tbody>
-					      </table>
+												<thead>
+												  <tr>
+													<th>#</th>
+													<th>Modelo</th>
+													<th>Quantidade</th>
+													<th>Informações</th>
+													<th>Excluir</th>
+												  </tr>
+												</thead>
+												<tbody>
+												  
+												  <?php foreach($itens as $indice=>$mat){?>
+												  <tr>
+													<td><?php echo $indice; ?></td>
+													<td><?php echo $mat['descricao']; ?></td>
+													<td><?php echo $mat['quantidade']; ?></td>
+													<td><?php echo $mat['informacoes']; ?></td>
+													<td><a href="" onclick="removeitemrat('<?php echo $indice; ?>')">Remover</a></td>
+												  </tr>
+												  <?php } ?>
+												  <tr>
+													<td>3</td>
+													<td>3</td>
+													<td>Larry the Bird</td>
+													<td>@twitter</td>
+													<td><a href="/atendimento/itemrat/remove/numeroitem">Remover</a></td>
+												  </tr>
+												</tbody>
+										</table>
+										</div>
+										<!--ELEMENTOS SALVOS NA SESSAO - FIM -->
+										</div>
 										</div>
 										
 									
@@ -573,8 +590,14 @@
 									<div class="form-group">
 										<label for="message" class="col-lg-4">Observações</label>
 										  <div class="col-md-8">
-											<textarea class="form-control" name="message" id="observacoes-finalizar" rows="4"></textarea>
-											</div>
+											
+											
+											<input type="hidden" name="atendimento_id"/>
+											
+											<textarea class="form-control" name="observacoes" id="observacoes-finalizar" rows="4"></textarea>
+									
+
+									</div>
 										</div>
 									
 										<div class="form-group">
@@ -718,6 +741,20 @@
 <script src="./js/plugins/msgGrowl/js/msgGrowl.js"></script>
 
 <script>
+	
+	
+	function MostrarMateriaisDoTecnico(){
+			$.ajax({
+		url:'/atendimento/ajaxMostrarMateriaisDoTecnico/ID',
+		type:'post',
+		data:dados,
+		dataType:'html'
+		success:function(retorno){
+			$('#MostrarMateriaisDoTecnico').html(retorno);
+			
+		}
+		});
+	}
 	
 	function enviarForm(nomeForm){
 	
@@ -915,17 +952,20 @@
 	
 	function incluiritemrat(){
 
-	var modelo = $('#modeloid').val();
-	var nserie = $('#numeroserie').val();
-	var ncartao = $('#numerocartao').val();
+	var materialTipo = $('#materialTipo').val();
+	var materialDescricao = $('#materialTipo').text();
+	var materialQuantidade = $('#materialQuantidade').val();
+	var materialInformacoes = $('#materialInformacoes').val();
+
 	
 	$.ajax({
 		url: "/atendimento/ajaxIncluirItemRat",
 		type: "POST",
-		data: { modelo_id : modelo, nserie:nserie, ncartao:ncartao},
+		data: { tipo_material_id : materialTipo, quantidade:materialQuantidade,descricao:materialDescricao, informacoes:materialInformacoes},
 		dataType: "html",
 		success:function(retorno){
 		
+				VisualizaTabelaItens();
 						},
 		error:function(){
 					alert('Deu erro');
@@ -933,9 +973,66 @@
 		});
 	}
 	
+	function removeitemrat(indice){
+	
+		$.ajax({
+		url:'/atendimento/ajaxRemoverItemRat/'+indice,
+		type:'post',
+		dataType:'html'
+		success:function(retorno){
+			
+			visualizaTabelaItens();
+			$.msgGrowl ({
+					type: 'success'
+					, title: 'Removido com sucesso'
+					, text: 'Informações salvas com sucesso.'
+					,position:'top-right'
+				});
+			
+		}
+		});
+	
+	
+	}
+	
+	function visualizaTabelaItens(){
+	
+	$.ajax({
+		url:'/atendimento/ajaxVisualizaTabelaItens',
+		type:'post',
+		dataType:'html'
+		success:function(retorno){
+			
+			$('#visualizaTabelaItens').html(retorno);
+			
+		}
+		});
+	
+	
+	}
+	
 	function carregarItens(){}
 
-
+	function VisualizaItensRat(){
+	
+		$.ajax({
+		url:'/atendimento/ajaxVisualizaItensRat',
+		type:'post',
+		data:{atendimento_id:<?php echo $atendimento_id;?>}
+		dataType:'html'
+		success:function(retorno){
+			
+			$('#VisualizaItensRat').html(retorno);
+			
+		}
+		});
+	
+	}
+	
+	$('#carregarMateriaisTecnico').onclick(function(){
+		MostrarMateriaisDoTecnico();
+	});
+	
 	$('.datepicker').datepicker({dateFormat:"dd/mm/yy"});
 	
 	var parametro = location.href.split('#').pop();
