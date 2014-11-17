@@ -169,11 +169,11 @@
         );
     }
 
-    function finalizar() {
+    function ajaxFinalizar() {
 
         var dados = $('#form-finalizar').serialize();
         $.ajax({
-            url: '/atendimento/agendar',
+            url: '/atendimento/finalizar',
             type: 'post',
             data: dados,
             dataType: 'json',
@@ -532,7 +532,10 @@
                         <fieldset>
 
                             <div id="MostrarMateriaisDoTecnico" class="form-horizontal col-md-12">
-                                Nenhum material Atribuido ao tecnico
+                                        <div class="alert alert-danger alert-dismissable">
+											  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+											  <strong>Desculpe!</strong> Nenhum material atribuido ao técnico definido no agendamento.</a>.
+										</div>
                             </div>
 
 
@@ -561,8 +564,25 @@
                                 <!--ELEMENTOS SALVOS NA SESSAO - FIM -->
                             </div>
 
-                            <form id="form-rat" class="form-horizontal col-md-12">
-                                <div class="form-group">
+                           <form id="form-rat" class="form-horizontal col-md-12">
+                                
+								<div class="form-group">
+                                    <label for="message" class="col-lg-4">Data da realização</label>
+                                    <div class="col-md-8">
+									
+                                        <input type="text" class="form-control datepicker" name="data[Rat][data_realizacao]"/>
+                                    </div>
+                                </div>
+								
+								<div class="form-group">
+                                    <label for="message" class="col-lg-4">Número RAT</label>
+                                    <div class="col-md-8">
+										<input type="hidden" class="form-control" name="data[Rat][atendimento_id]" value="<?php echo $atendimento['Atendimento']['atendimento_id']; ?>"/>
+                                        <input type="text" class="form-control" name="data[Rat][numero_rat]"/>
+                                    </div>
+                                </div>
+								
+								<div class="form-group">
                                     <label for="message" class="col-lg-4">Observações</label>
                                     <div class="col-md-8">
                                         <input type="hidden" value="numeroos" name="numeroos" class="form-control" />
@@ -578,7 +598,8 @@
                                 </div>
 
                             </form>
-                        </fieldset>
+                        
+						   </fieldset>
                     </div>	
 
                     <div class="tab-pane" id="finalizar">
@@ -586,46 +607,13 @@
                             <fieldset>
 
 
+                                 
+	
                                 <div class="form-group">
-                                    <label>
-                                        Equipamento utilizado.
-                                    </label>
-                                    <table class="table table-bordered table-hover table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Modelo</th>
-                                                <th>Nº Série</th>
-                                                <th>Nº Cartão</th>
-                                                <th>Técnico</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            <tr>
-                                                <td>2</td>
-                                                <td>Jacob</td>
-                                                <td>Thornton</td>
-                                                <td>@fat</td>
-                                                <td>Joan</td>
-                                            </tr>
-
-                                        <td>3</td>
-                                        <td>3</td>
-                                        <td>Larry the Bird</td>
-                                        <td>@twitter</td>
-                                        <td><a href="/atendimento/itemrat/remove/numeroitem">Remover</a></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-
-
-                                <div class="form-group">
-                                    <label for="message" class="col-lg-4">Observações</label>
+                                    <label for="message" class="col-lg-4">Observações de finalizacao</label>
                                     <div class="col-md-8">
-                                        <textarea class="form-control" name="message" id="observacoes-finalizar" rows="4"></textarea>
+									<input type="" name="data[Atendimento][atendimento_id]" value="<?php echo $atendimento['Atendimento']['atendimento_id'];?>"/>
+								 <textarea class="form-control" name="data[Atendimento][informacoes]" id="observacoes-finalizar" rows="4"></textarea>
                                     </div>
                                 </div>
 
