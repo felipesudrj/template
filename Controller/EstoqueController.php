@@ -43,10 +43,74 @@ class EstoqueController extends AppController {
     public function listarmaterial() {
         
     }
-    
-	public function distribuir(){}
-    
-    public function excluir() {
+   
+   
+	
+	public function materialdistribuido(){}
+	
+	public function devolucaomaterial($tecnico_id){}
+	
+    public function excluirmaterial($material_id) {
         
     }
-}
+
+	public function distribuir(){
+	
+	$materiais = $this->Material->find('list');
+	$tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
+	$this->set(compact('materiais','tecnicos'));
+
+		if($this->request->is('post')){
+		
+		
+			/* PEGAR MATERIAIS GRAVADOS NA SESSAO */
+			/* REGISTRAR A OPERACAO NA TABELA DE TotalMaterial */
+			/* SUBTRATIR OS VALOR DO TOTAL REGISTRADO PARA CADA MATERIAL DA SESSAO */
+		
+		}
+	
+	}
+    	
+	public function ajaxIncluirItem() {
+
+        $this->layout = null;
+
+        if ($this->request->is('post')) {
+
+
+
+            if (isset($this->Session->read('itens'))) {
+
+                $dados = array('material_id' => $_post['material_id'], 'descricao' => $_post['descricao'], 'quantidade' => $_post['quantidade'], 'informacoes' => $_post['informacoes']);
+                $novoItem[] = $this->Session->read('itens')
+                $novoItem[] = $dados;
+                $itens = $this->Session->write('itens', $novoItem);
+            } else {
+                $dados['0']['material_id'] = $_post['material_id'];
+                $dados['0']['quantidade'] = $_post['quantidade'];
+                $dados['0']['informacoes'] = $_post['informacoes'];
+                $dados['0']['descricao'] = $_post['descricao'];
+                $novoItem = $this->Session->write('itens', $dados);
+            }
+        }
+    }
+
+    public function ajaxRemoverItem($indice) {
+
+        $dados = $this->Session->read('itens');
+        unset($dados[$indice]);
+        $this->Session->write('itens', $dados);
+        die;
+    }
+
+	public function ajaxVisualizaTabelaItens() {
+        $this->layout = null;
+        $itensSalvos = $this->Session->read('itens');
+        $this->set('itens', $itensSalvos);
+    }
+	
+
+	public function relatorioitens(){
+	/* IMPRIMIR LISTA DE MATERIAIS ENTREGUES AO TÉCNICO */
+	}
+	}
