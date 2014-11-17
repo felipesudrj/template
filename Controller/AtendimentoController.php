@@ -412,11 +412,21 @@ class AtendimentoController extends AppController {
         $update['Atendimento']['atendimento_id'] = $dados['Agendamento']['atendimento_id'];
         $update['Atendimento']['status_atendimento_id'] = '6';
 
-        $tecnico_id = $this->Atendimento->findByatendimento_id($dados['Agendamento']['atendimento_id']);
-        $itensUsados = $this->MaterialUtilizado->findByatendimento_id($dados['Agendamento']['atendimento_id']);
+		if($this->request->is('post')){
+			try {
+			$this->Atendimento->save($dados);
+			$retorno = array('msg' => 'Finalizado', 'titulo' => 'Sucesso', 'tipo' => 'success');
+            echo json_encode($retorno);
+            die;
+			 } catch (Exception $e) {
 
-        /* Chamar função na controller estoque e subtrair valor de total de materiais utilizados */
-        /* na tabela totalMaterial subtrair o total de material conforme o valor já encontrado dentro da tabela */
+                    $msg = "Ocorreu um erro ao realizar a atribuição." . $e->getMessage();
+                    $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
+                    echo json_encode($retorno);
+                    die;
+                }
+		}
+		
     }
 
 }
