@@ -18,35 +18,66 @@ class EstoqueController extends AppController {
 
 	public function atualizarnumeros($material_id,$quantidade,$operacao,$tecnico_id){
 	
-			$total = $this->TotalMaterial->find('first',array(
-												'fields'=>array('quantidade','material_id','total_material_id'),
-												'conditions'=>array('tecnico_id'=>$tecnico_id,'material_id'=>$material_id),
-												'group'=>array('material_id','tecnico_id')
-												));
+			$material  = $this->Material->find('first',array(
+													'conditions'=>array('Material.material_id'=>$material_id)
+													));
+										
 												
 			if($operacao=='1'){
-				$total['TotalMaterial']['quantidade'] = $total['TotalMaterial']['quantidade'] + $quantidade;
+				$updateTotal['Material']['quantidade'] = $updateTotal['Material']['quantidade'] + $quantidade;
 			}else{
-				$total['TotalMaterial']['quantidade'] = $total['TotalMaterial']['quantidade'] - $quantidade;
+				$updateTotal['TotalMaterial']['quantidade'] = $updateTotal['TotalMaterial']['quantidade'] - $quantidade;
 			}
+			/*ATUALIZAR QUANTIDADE DE MATERIAIS */
+			$updateTotal['Material']['material_id'] = 	$material['Material']['material_id'];									
+			$this->Material->save($updateTotal);
 			
-			$this->TotalMaterial->save($total);
+			/*GRAVAR HISTORICO DE MATERIAIS*/
+			$historico['TotalMaterial']['material_id'] = $material['Material']['material_id'];	
+			$historico['TotalMaterial']['quantidade'] = $quantidade;	
+			$historico['TotalMaterial']['operacao'] = $operacao;
+			$historico['TotalMaterial']['tecnico_id'] = $tecnico_id;
+			$this->TotalMaterial->save($historico);
+			return true;
 	
 	}
 
     public function cadastrarmaterial() {
         
 		$UnidadeMedidas = $this->UnidadeMedida->find('list',array('fields'=>array('unidade_medida_id','descricao')));
+		if($this->request->is('post')){
+			 $dataSource = $this->Material->getDataSource();
+			$form = $this->request->data;
+			
+			$this->Material->set($form);
+			if($this->Material->validates()){
+					
+					$dataSource->begin();
+					$this->Material->save($form);
+					$dataSource->commit();
+					$this->Session->setFlash('Material cadastrado com sucesso.', false, false, 'confirma');
+
+			
+			}else{
+					$errors = $this->Material->validationErrors;
+					$msg = "";
+					foreach ($errors as $indice => $mensagem) {
+                    $msg.= $mensagem['0'] . ".\n";
+					};
+					$dataSource->rollback();
+					$this->Session->setFlash($msg, false, false, 'negar');
+					
+					
+			}
 		
+		}
     }
 
     public function listarmaterial() {
         
     }
    
-   
-	
-	public function materialdistribuido(){}
+    public function atualizaquantidade($material_id){}
 	
 	public function devolucaomaterial($tecnico_id){}
 	
@@ -62,10 +93,46 @@ class EstoqueController extends AppController {
 
 		if($this->request->is('post')){
 		
+			$dataSource = $this->MaterialDistribuido->getDataSource();
 		
 			/* PEGAR MATERIAIS GRAVADOS NA SESSAO */
+			$itens = $this->Session->read('itens');
+			if (!empty($itens)) {
+				
+				$dataSource->begin();
+				
+				try{
+					
+					foreach($itens as $indice=>$valor){
+					
+					$saveMaterialDistribuido['MaterialDistribuido']['material_id'] = $valor['material_id'];
+					$saveMaterialDistribuido['MaterialDistribuido']['tecnico_id'] = $valor['tecnico_id'];
+					$saveMaterialDistribuido['MaterialDistribuido']['quantidade'] = $valor['quantidade'];
+					$saveMaterialDistribuido['MaterialDistribuido']['informacoes'] = $valor['informacoes'];
+					$operacao = 1; //somar
+					
+					/*ATUALIZAR SALDO TOTAL DE MATERIAL E GRAVAR HISTORICO*/
+					if($this->atualizarnumeros($valor['material_id'],$valor['quantidade'],$operacao,$valor['tecnico_id'])){
+					
+						$this->MaterialDistribuido->create();
+						$this->MaterialDistribuido->save($saveMaterialDistribuido);
+						
+					};
+					
+					
+				}
+				
+					$dataSource->commit();
+					
+				}catch (Exception $e) {
+					
+					$dataSource->rollback();
+				}
+				
+			}
 			/* REGISTRAR A OPERACAO NA TABELA DE TotalMaterial */
-			/* SUBTRATIR OS VALOR DO TOTAL REGISTRADO PARA CADA MATERIAL DA SESSAO */
+			
+			
 		
 		}
 	
@@ -108,7 +175,6 @@ class EstoqueController extends AppController {
         $itensSalvos = $this->Session->read('itens');
         $this->set('itens', $itensSalvos);
     }
-	
 
 	public function relatorioitens(){
 	/* IMPRIMIR LISTA DE MATERIAIS ENTREGUES AO TÉCNICO */
