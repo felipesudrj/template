@@ -16,35 +16,11 @@ class EstoqueController extends AppController {
 	 public $uses = array(
         'Atendimento', 'Material','MaterialDistribuido','MaterialUtilizado','TotalMaterial');
 
-	public function atualizarnumeros($material_id,$quantidade,$operacao,$tecnico_id){
 	
-			$material  = $this->Material->find('first',array(
-													'conditions'=>array('Material.material_id'=>$material_id)
-													));
-										
-												
-			if($operacao=='1'){
-				$updateTotal['Material']['quantidade'] = $updateTotal['Material']['quantidade'] + $quantidade;
-			}else{
-				$updateTotal['TotalMaterial']['quantidade'] = $updateTotal['TotalMaterial']['quantidade'] - $quantidade;
-			}
-			/*ATUALIZAR QUANTIDADE DE MATERIAIS */
-			$updateTotal['Material']['material_id'] = 	$material['Material']['material_id'];									
-			$this->Material->save($updateTotal);
-			
-			/*GRAVAR HISTORICO DE MATERIAIS*/
-			$historico['TotalMaterial']['material_id'] = $material['Material']['material_id'];	
-			$historico['TotalMaterial']['quantidade'] = $quantidade;	
-			$historico['TotalMaterial']['operacao'] = $operacao;
-			$historico['TotalMaterial']['tecnico_id'] = $tecnico_id;
-			$this->TotalMaterial->save($historico);
-			return true;
-	
-	}
-
     public function cadastrarmaterial() {
         
 		$UnidadeMedidas = $this->UnidadeMedida->find('list',array('fields'=>array('unidade_medida_id','descricao')));
+		
 		if($this->request->is('post')){
 			 $dataSource = $this->Material->getDataSource();
 			$form = $this->request->data;
@@ -53,7 +29,8 @@ class EstoqueController extends AppController {
 			if($this->Material->validates()){
 					
 					$dataSource->begin();
-					$this->Material->save($form);
+					/* GRAVA DADOS DO MATERIAL E QUANTIDADE DE MATERIAL QUE EXISTE */
+					$this->Material->saveAll($form);
 					$dataSource->commit();
 					$this->Session->setFlash('Material cadastrado com sucesso.', false, false, 'confirma');
 
@@ -74,7 +51,7 @@ class EstoqueController extends AppController {
     }
 
     public function listarmaterial() {
-        
+        /* PEGAR TOTAL DE MATERIAIS  EM ESTOQUE (TOTALMATERIAL) E TOTAL DE MATERIAS DISTRIBUIDOS (MATERIALDISTRIBUIDIO) */
     }
    
     public function atualizaquantidade($material_id){}
@@ -109,18 +86,10 @@ class EstoqueController extends AppController {
 					$saveMaterialDistribuido['MaterialDistribuido']['tecnico_id'] = $valor['tecnico_id'];
 					$saveMaterialDistribuido['MaterialDistribuido']['quantidade'] = $valor['quantidade'];
 					$saveMaterialDistribuido['MaterialDistribuido']['informacoes'] = $valor['informacoes'];
-					$operacao = 1; //somar
 					
-					/*ATUALIZAR SALDO TOTAL DE MATERIAL E GRAVAR HISTORICO*/
-					if($this->atualizarnumeros($valor['material_id'],$valor['quantidade'],$operacao,$valor['tecnico_id'])){
-					
-						$this->MaterialDistribuido->create();
-						$this->MaterialDistribuido->save($saveMaterialDistribuido);
-						
-					};
-					
-					
-				}
+					$this->MaterialDistribuido->create();
+					$this->MaterialDistribuido->save($saveMaterialDistribuido);
+					}
 				
 					$dataSource->commit();
 					
