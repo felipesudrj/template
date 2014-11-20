@@ -70,7 +70,7 @@
                 $('#carregando').modal('show');
             },
             success: function(retorno) {
-                $('#agendamento_id').val(retorno.id);
+
                 $.msgGrowl({
                     type: retorno.tipo
                     , title: retorno.titulo
@@ -135,7 +135,7 @@
     function rat() {
         var dados = $('#form-rat').serialize();
         $.ajax({
-            url: '/atendimento/ajaxRat',
+            url: '/atendimento/agendar',
             type: 'post',
             data: dados,
             dataType: 'json',
@@ -145,9 +145,9 @@
             success: function(retorno) {
 
                 $.msgGrowl({
-                    type: retorno.tipo
-                    , title: retorno.titulo
-                    , text: retorno.msg
+                    type: 'success'
+                    , title: 'Salvo com sucesso'
+                    , text: 'Informações salvas com sucesso.'
                     , position: 'top-right'
                 });
 
@@ -169,11 +169,11 @@
         );
     }
 
-    function ajaxFinalizar() {
+    function finalizar() {
 
         var dados = $('#form-finalizar').serialize();
         $.ajax({
-            url: '/atendimento/finalizar',
+            url: '/atendimento/agendar',
             type: 'post',
             data: dados,
             dataType: 'json',
@@ -278,12 +278,13 @@
         $.ajax({
             url: '/atendimento/ajaxRemoverItemRat/' + indice,
             type: 'post',
-            dataType: 'json',
+            dataType: 'html',
             success: function(retorno) {
                 $.msgGrowl({
-                    type: retorno.tipo
-                    , title: retorno.titulo
-                    , text: retorno.msg
+                    type: 'success'
+                    , title: 'Removido com sucesso'
+                    , text: 'Informações salvas com sucesso.'
+                    , position: 'top-right'
                 });
                 VisualizaTabelaItens('<?php echo $atendimento['Atendimento']['atendimento_id']; ?>');
             }
@@ -447,25 +448,12 @@
 
 
 
-                                <div class="form-group">
-                                    <label class="col-md-4" for="emailserver">Período</label>
-                                    <div class="col-md-8">
-                                        <?php
-                                        $perido = array('manha'=>'Manhã','Tarde','Noite'=>'Noite');
-                                        echo $this->Form->input('Agendamento.periodo',array('type'=>'select','options'=>$perido,'class'=>'form-control select-box','label'=>false));?>
-                                        
-                                        
-                                    </div>
-                                </div>
-
 
                                 <div class="form-group">
                                     <label class="col-md-4" for="emailserver">Data de agendamento</label>
                                     <div class="col-md-8">
-                                        <?php echo $this->Form->input('Agendamento.agendamento_id', array('type' => 'hidden','id'=>'agendamento_id')); ?>
-
                                         <?php echo $this->Form->input('Agendamento.atendimento_id', array('type' => 'hidden', 'value' => $this->request->data['Atendimento']['atendimento_id'])); ?>
-                                        <?php $data_agendamento = !empty($this->request->data['Agendamento']['data_agendamento']) ? $this->request->data['Agendamento']['data_agendamento'] : date('d/m/Y'); ?>
+                                        <?php $data_agendamento = !empty($this->request->data['Agendamento']['0']['data_agendamento']) ? date('d/m/Y', strtotime($this->request->data['Agendamento']['0']['data_agendamento'])) : date('d/m/Y'); ?>
                                         <?php echo $this->Form->input('Agendamento.data_agendamento', array('type' => 'text', 'class' => 'form-control datepicker', 'value' => $data_agendamento, 'id' => 'data-agendamento', 'label' => false)); ?>
 
                                     </div>
@@ -475,7 +463,7 @@
                                 <div class="form-group">
                                     <label class="col-md-4" for="contato">Contato</label>
                                     <div class="col-md-8">
-                                        <?php $contato = !empty($this->request->data['Agendamento']['contato']) ? $this->request->data['Agendamento']['contato'] : ""; ?>
+                                        <?php $contato = !empty($this->request->data['Agendamento']['0']['contato']) ? $this->request->data['Agendamento']['0']['contato'] : ""; ?>
                                         <?php echo $this->Form->input('Agendamento.contato', array('type' => 'text', 'class' => 'form-control', 'value' => $contato, 'id' => 'agendamento-contato', 'label' => false)); ?>
 
                                     </div>
@@ -485,7 +473,7 @@
                                     <label for="message" class="col-lg-4">Observações</label>
                                     <div class="col-md-8">
 
-                                        <?php $observacao = !empty($this->request->data['Agendamento']['observacoes']) ? $this->request->data['Agendamento']['observacoes'] : ""; ?>
+                                        <?php $observacao = !empty($this->request->data['Agendamento']['0']['observacoes']) ? $this->request->data['Agendamento']['0']['observacoes'] : ""; ?>
                                         <?php echo $this->Form->textarea('Agendamento.observacoes', array('rows' => '4', 'class' => 'form-control datepicker', 'value' => $observacao, 'id' => 'agendamento-observacoes', 'label' => false)); ?>
 
                                     </div>
@@ -544,10 +532,7 @@
                         <fieldset>
 
                             <div id="MostrarMateriaisDoTecnico" class="form-horizontal col-md-12">
-                                <div class="alert alert-danger alert-dismissable">
-                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                    <strong>Desculpe!</strong> Nenhum material atribuido ao técnico definido no agendamento.</a>.
-                                </div>
+                                Nenhum material Atribuido ao tecnico
                             </div>
 
 
@@ -577,27 +562,12 @@
                             </div>
 
                             <form id="form-rat" class="form-horizontal col-md-12">
-
-                                <div class="form-group">
-                                    <label for="message" class="col-lg-4">Data da realização</label>
-                                    <div class="col-md-8">
-
-                                        <input type="text" class="form-control datepicker" name="data[Rat][data_realizacao]"/>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="message" class="col-lg-4">Número RAT</label>
-                                    <div class="col-md-8">
-                                        <input type="hidden" class="form-control" name="data[Rat][atendimento_id]" value="<?php echo $atendimento['Atendimento']['atendimento_id']; ?>"/>
-                                        <input type="text" class="form-control" name="data[Rat][numero_rat]"/>
-                                    </div>
-                                </div>
-
                                 <div class="form-group">
                                     <label for="message" class="col-lg-4">Observações</label>
                                     <div class="col-md-8">
-                                        <textarea class="form-control" name="data[Rat][informacoes]" id="observacoes-rat" rows="4"></textarea>
+                                        <input type="hidden" value="numeroos" name="numeroos" class="form-control" />
+                                        <input type="hidden" value="2" name="atendimento_id" class="form-control" />
+                                        <textarea class="form-control" name="observacoes" id="observacoes-rat" rows="4"></textarea>
                                     </div>
                                 </div>
 
@@ -608,7 +578,6 @@
                                 </div>
 
                             </form>
-
                         </fieldset>
                     </div>	
 
@@ -617,10 +586,44 @@
                             <fieldset>
 
 
+                                <div class="form-group">
+                                    <label>
+                                        Equipamento utilizado.
+                                    </label>
+                                    <table class="table table-bordered table-hover table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Modelo</th>
+                                                <th>Nº Série</th>
+                                                <th>Nº Cartão</th>
+                                                <th>Técnico</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr>
+                                                <td>2</td>
+                                                <td>Jacob</td>
+                                                <td>Thornton</td>
+                                                <td>@fat</td>
+                                                <td>Joan</td>
+                                            </tr>
+
+                                        <td>3</td>
+                                        <td>3</td>
+                                        <td>Larry the Bird</td>
+                                        <td>@twitter</td>
+                                        <td><a href="/atendimento/itemrat/remove/numeroitem">Remover</a></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
 
 
                                 <div class="form-group">
-                                    <label for="message" class="col-lg-4">Observações de finalizacao</label>
+                                    <label for="message" class="col-lg-4">Observações</label>
                                     <div class="col-md-8">
                                         <textarea class="form-control" name="message" id="observacoes-finalizar" rows="4"></textarea>
                                     </div>

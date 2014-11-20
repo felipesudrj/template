@@ -1,4 +1,4 @@
-<?php // echo $this->element('sql_dump');?>
+<?php // echo $this->element('sql_dump'); ?>
 
 
 
@@ -8,76 +8,76 @@
     <div class="col-md-12">      		
 
         <div class="widget stacked">
-			<?php echo $this->FilterForm->create(); ?>
-				<div class="widget-header">
-					<i class="icon-filter"></i>
-					<h3>Filtro</h3>
-				</div> <!-- /widget-header -->
-				
-				<div class="widget-content ">
-					
+            <?php echo $this->FilterForm->create(); ?>
+            <div class="widget-header">
+                <i class="icon-filter"></i>
+                <h3>Filtro</h3>
+            </div> <!-- /widget-header -->
 
-				
-				
-				<div class="col-md-3">
-				
-					<div class="form-group">
-							<label>Número de OS</label>
-                                                        <?php echo $this->FilterForm->input('nros',array('type'=>'text',"class"=>"form-control"));?>
-							
-					</div>
-				
-					<div class="form-group ">
+            <div class="widget-content ">
 
-				            <label>Tipo de serviço</label>
-                                            <?php echo $this->FilterForm->input('tipoServico', array('class' => 'select-box form-control'));?>
-				            
-					</div>
-					
-				
-					
-					
-				</div>
 
-				<!--INCLUIR OBSERVACOES-->
-				<div class="col-md-3 ">
-                                  
-                                    
-                                  <div class="form-group ">
 
-				            <label>Nome do Cliente</label>
-                                            <?php echo $this->FilterForm->input('nomeCliente',array('type'=>'text', 'class'=>'form-control'));?>
-				            
-					</div> 
-                                    
-                                <div class="form-group ">
 
-				            <label>Tecnico responsável</label>
-                                            <?php echo $this->FilterForm->input('tecnico', array('class' => 'select-box form-control'));?>
-				            
-					</div> 
-                                    
-				
-				</div>
-                                
-                                <div class="col-md-3">
-                                    <div class="form-group ">
+                <div class="col-md-3">
 
-				            <label>Status serviço</label>
-                                            <?php echo $this->FilterForm->input('statusAtendimento', array('class' => 'select-box form-control'));?>
-				            
-					</div>
-                                    
-                                    <div class="form-group" >
-                                    <label></label>
-                                        <?php echo $this->FilterForm->submit('Filtrar',array('class'=>'btn btn-success'));?>
+                    <div class="form-group">
+                        <label>Número de OS</label>
+                        <?php echo $this->FilterForm->input('nros', array('type' => 'text', "class" => "form-control")); ?>
 
-				</div>
-                                </div>
-			</div>
-			</form>						
-			</div> <!-- /widget -->
-        
+                    </div>
+
+                    <div class="form-group ">
+
+                        <label>Tipo de serviço</label>
+                        <?php echo $this->FilterForm->input('tipoServico', array('class' => 'select-box form-control')); ?>
+
+                    </div>
+
+
+
+
+                </div>
+
+                <!--INCLUIR OBSERVACOES-->
+                <div class="col-md-3 ">
+
+
+                    <div class="form-group ">
+
+                        <label>Nome do Cliente</label>
+                        <?php echo $this->FilterForm->input('nomeCliente', array('type' => 'text', 'class' => 'form-control')); ?>
+
+                    </div> 
+
+                    <div class="form-group ">
+
+                        <label>Tecnico responsável</label>
+                        <?php echo $this->FilterForm->input('tecnico', array('class' => 'select-box form-control')); ?>
+
+                    </div> 
+
+
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group ">
+
+                        <label>Status serviço</label>
+                        <?php echo $this->FilterForm->input('statusAtendimento', array('class' => 'select-box form-control')); ?>
+
+                    </div>
+
+                    <div class="form-group" >
+                        <label></label>
+                        <?php echo $this->FilterForm->submit('Filtrar', array('class' => 'btn btn-success')); ?>
+
+                    </div>
+                </div>
+            </div>
+            </form>						
+        </div> <!-- /widget -->
+
         <div class="widget stacked ">
 
             <div class="widget-header">
@@ -122,15 +122,31 @@
                                         <span class="label <?php echo $label; ?>"><?php echo $dados['StatusAtendimento']['descricao']; ?></span>
 
                                     </td>
-                                    <td>-</td>
+                                    <td><?php echo $dados['Tecnico']['nome']; ?></td>
 
                                     <td>
-                                        <a href="/atendimento/alterar/<?php echo $dados['Atendimento']['atendimento_id']; ?>#dadosos" class="badge"><i class="icon-search"></i> Visualizar</a>|
-                                        <a href="/atendimento/alterar/<?php echo $dados['Atendimento']['atendimento_id']; ?>#agendamento" class="badge"><i class="icon-calendar"></i> Agendar</a>|
-                                        <a href="/atendimento/alterar/<?php echo $dados['Atendimento']['atendimento_id']; ?>#atribuicao" class="badge"><i class="icon-plus"></i> Atribuir</a>
+                                        <a href="/atendimento/alterar/<?php echo $dados['Atendimento']['atendimento_id']; ?>#dadosos" class="badge"><i class="icon-search"></i> Visualizar</a>
+
+                                        <?php if ($dados['StatusAtendimento']['status_atendimento_id'] == 1) { ?>
+
+                                            <a href="/atendimento/alterar/<?php echo $dados['Atendimento']['atendimento_id']; ?>#agendamento" class="badge"><i class="icon-calendar"></i> Agendar</a>
+
+                                        <?php } ?>
+
+                                        <?php if ($dados['StatusAtendimento']['status_atendimento_id'] == 2) { ?>
+
+                                            <a href="/atendimento/alterar/<?php echo $dados['Atendimento']['atendimento_id']; ?>#atribuicao" class="badge"><i class="icon-plus"></i> Atribuir ao técnico</a>
+
+                                        <?php } ?>
+                                            
+                                       <?php if ($dados['StatusAtendimento']['status_atendimento_id'] == 4) { ?>
+
+                                            <a href="/atendimento/alterar/<?php echo $dados['Atendimento']['atendimento_id']; ?>#finalizar" class="badge "><i class="icon-list"></i> Finaliza demanda</a>
+
+                                        <?php } ?>
                                     </td>
                                 </tr>
-<?php } ?>
+                            <?php } ?>
 
                         </tbody>
                         <tfoot>
@@ -138,16 +154,16 @@
                                 <td colspan="6">
                                     <div class="col-md-4"></div>
                                     <div class="col-md-4" style="text-align: center;"><?php
-                                    echo $this->Paginator->counter(
-                                                        'Total de registros {:count}'
-                                                    );
-                                    ?>
-                                    <br>
-                                    <?php echo $this->Paginator->first('Primeira');?>  
-                                    <?php echo $this->paginator->numbers();?>  
-                                    <?php echo $this->Paginator->last('Última');?> 
+                                        echo $this->Paginator->counter(
+                                                'Total de registros {:count}'
+                                        );
+                                        ?>
+                                        <br>
+                                        <?php echo $this->Paginator->first('Primeira'); ?>  
+                                        <?php echo $this->paginator->numbers(); ?>  
+                                        <?php echo $this->Paginator->last('Última'); ?> 
                                     </div>
-                                    
+
                                 </td>
                             </tr>
                         </tfoot>

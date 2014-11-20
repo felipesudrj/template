@@ -16,73 +16,15 @@ App::import('Vendor', 'ex/simplexlsx');
 class AtendimentoController extends AppController {
 
     public $uses = array(
-        'Atendimento', 'TipoServico', 'StatusAtendimento', 'Rat',
+        'Atendimento', 'TipoServico', 'StatusAtendimento',
         'Agendamento', 'Atribuicao', 'Tecnico', 'MaterialDistribuido', 'MaterialUtilizado');
     public $components = array('Session');
-
-    public function tecnico() {
-
-        $breadcrumb = array(
-            '/' => 'Painel Inicial',
-            '' => 'Lista de chamados'
-        );
-        $this->set(compact('breadcrumb'));
-        $statusAtendimento = $this->StatusAtendimento->find('list', array('fields' => array('status_atendimento_id', 'descricao')));
-        $tipoServico = $this->TipoServico->find('list', array('fields' => array('tipo_servico_id', 'descricao')));
-
-
-        $optio = array(
-            'nros' => array(
-                'Atendimento.nros' => array(
-                    'operator' => '='
-                )
-            ),
-            'agendamento' => array(
-                'agendamento.data_agendamento' => array(
-                    'operator' => 'BETWEEN',
-                    'between' => array(
-                        'text' => __(' e ', true),
-                        'date' => true
-                    )
-                )
-            ),
-            'tipoServico' => array(
-                'Atendimento.tipo_servico_id' => array(
-                    'operator' => '=',
-                    'select' => $this->FilterResults->select('Todos', $tipoServico)
-                )
-            ),
-            'statusAtendimento' => array(
-                'Atendimento.status_atendimento_id' => array(
-                    'operator' => '=',
-                    'select' => $this->FilterResults->select('Todos', $statusAtendimento)
-                )
-            )
-        );
-        $this->FilterResults->addFilters($optio);
-        $this->FilterResults->setPaginate('group', 'Atendimento.nros');  // optional
-
-        $this->FilterResults->setPaginate('limit', 10);              // optional
-        $conditions = $this->FilterResults->getConditions();
-        $conditions['Atendimento.tecnico_id'] = 11;
-        $this->FilterResults->setPaginate('conditions', $conditions);
-
-        $atendimentos = $this->Paginate('Atendimento');
-        $this->set('atendimento', $atendimentos);
-    }
 
     public function index() {
         
     }
 
     public function alterar($atendimento_id) {
-
-        $breadcrumb = array(
-            '/' => 'Painel inicial',
-            '' => 'Dados da demanda'
-        );
-        $this->set(compact('breadcrumb'));
-
         $atendimento = $this->Atendimento->findByatendimento_id($atendimento_id);
         $this->request->data = $atendimento;
         $tipoServico = $this->TipoServico->find('list', array('fields' => array('tipo_servico_id', 'descricao')));
@@ -90,7 +32,7 @@ class AtendimentoController extends AppController {
         $tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
 
 
-//        pr($atendimento);
+
         $this->set(compact('atendimento', 'tipoServico', 'statusAtendimento', 'tecnicos'));
     }
 
@@ -127,11 +69,7 @@ class AtendimentoController extends AppController {
     }
 
     public function importar() {
-        $breadcrumb = array(
-            '/' => 'Painel Inicial',
-            '' => 'Importar demandas'
-        );
-        $this->set(compact('breadcrumb'));
+
         $dataSource = $this->Atendimento->getDataSource();
 
         if ($this->request->is('post')) {
@@ -143,93 +81,52 @@ class AtendimentoController extends AppController {
             if ($this->request->data['Atendimento']['tipo_id'] == 1) {
                 foreach ($dados as $indice => $valor) {
 
-                    if (!empty($valor['2'])) {
-
-                        if ($indice != 0) {
+                    if ($indice != 0) {
 
 
-                            $salvar[$indice]['Atendimento']['nros'] = $valor['2']; /* Ordem de servico */
-                            $salvar[$indice]['Atendimento']['nrcontrato'] = $valor['4']; /* Contrato */
-                            $salvar[$indice]['Atendimento']['observacoes'] = $valor['19']; /* observacoes */
-                            $salvar[$indice]['Atendimento']['tipo_servico_id'] = 1; /* observacoes */
-                            $salvar[$indice]['Atendimento']['tarefa'] = $valor['13']; /* Tarefa */
-                            $salvar[$indice]['Atendimento']['periodo'] = $valor['14']; /* Periodo */
-                            $salvar[$indice]['Atendimento']['status_atendimento_id'] = 1; /* status atendimento id */
+                        $salvar[$indice]['Atendimento']['nros'] = $valor['2']; /* Ordem de servico */
+                        $salvar[$indice]['Atendimento']['nrcontrato'] = $valor['4']; /* Contrato */
+                        $salvar[$indice]['Atendimento']['observacoes'] = $valor['19']; /* observacoes */
+                        $salvar[$indice]['Atendimento']['tipo_servico_id'] = 1; /* observacoes */
+                        $salvar[$indice]['Atendimento']['tarefa'] = $valor['13']; /* Tarefa */
+                        $salvar[$indice]['Atendimento']['periodo'] = $valor['14']; /* Periodo */
+                        $salvar[$indice]['Atendimento']['status_atendimento_id'] = 1; /* status atendimento id */
 
 
-                            $salvar[$indice]['Cliente']['nome'] = $valor['5']; /* Cliente */
-                            $salvar[$indice]['Cliente']['logradouro'] = $valor['6']; /* Logradouro */
-                            $salvar[$indice]['Cliente']['numero'] = $valor['7']; /* Numero */
-                            $salvar[$indice]['Cliente']['complemento'] = $valor['8']; /* Complemento */
-                            $salvar[$indice]['Cliente']['bairro'] = $valor['9']; /* Bairro */
-                            $salvar[$indice]['Cliente']['cidade'] = $valor['10']; /* Cidade */
-                            $salvar[$indice]['Cliente']['telefone1'] = $valor['16']; /* Fone */
-                            $salvar[$indice]['Cliente']['telefone2'] = $valor['17']; /* Fone */
-                            $salvar[$indice]['Cliente']['telefone3'] = $valor['18']; /* Fone */
-                        }
+                        $salvar[$indice]['Cliente']['nome'] = $valor['5']; /* Cliente */
+                        $salvar[$indice]['Cliente']['logradouro'] = $valor['6']; /* Logradouro */
+                        $salvar[$indice]['Cliente']['numero'] = $valor['7']; /* Numero */
+                        $salvar[$indice]['Cliente']['complemento'] = $valor['8']; /* Complemento */
+                        $salvar[$indice]['Cliente']['bairro'] = $valor['9']; /* Bairro */
+                        $salvar[$indice]['Cliente']['cidade'] = $valor['10']; /* Cidade */
+                        $salvar[$indice]['Cliente']['telefone1'] = $valor['16']; /* Fone */
+                        $salvar[$indice]['Cliente']['telefone2'] = $valor['17']; /* Fone */
+                        $salvar[$indice]['Cliente']['telefone3'] = $valor['18']; /* Fone */
                     }
                 }
-            } else {
-                foreach ($dados as $indice => $valor) {
 
-                    
-                    
-                    if (!empty($valor['2'])) {
+                try {
 
-                        if ($indice != 0) {
+                    $dataSource->begin();
 
-
-                            $salvar[$indice]['Atendimento']['nros'] = $valor['2']; /* Ordem de servico */
-                            $salvar[$indice]['Atendimento']['nrcontrato'] = $valor['4']; /* Contrato */
-                            $salvar[$indice]['Atendimento']['observacoes'] = $valor['19']; /* observacoes */
-                            $salvar[$indice]['Atendimento']['tipo_servico_id'] = 1; /* observacoes */
-                            $salvar[$indice]['Atendimento']['tarefa'] = $valor['13']; /* Tarefa */
-                            $salvar[$indice]['Atendimento']['periodo'] = $valor['14']; /* Periodo */
-                            $salvar[$indice]['Atendimento']['status_atendimento_id'] = 1; /* status atendimento id */
-
-
-                            $salvar[$indice]['Cliente']['nome'] = $valor['5']; /* Cliente */
-                            $salvar[$indice]['Cliente']['logradouro'] = $valor['6']; /* Logradouro */
-                            $salvar[$indice]['Cliente']['numero'] = $valor['7']; /* Numero */
-                            $salvar[$indice]['Cliente']['complemento'] = $valor['8']; /* Complemento */
-                            $salvar[$indice]['Cliente']['bairro'] = $valor['9']; /* Bairro */
-                            $salvar[$indice]['Cliente']['cidade'] = $valor['10']; /* Cidade */
-                            $salvar[$indice]['Cliente']['telefone1'] = $valor['16']; /* Fone */
-                            $salvar[$indice]['Cliente']['telefone2'] = $valor['17']; /* Fone */
-                            $salvar[$indice]['Cliente']['telefone3'] = $valor['18']; /* Fone */
-                        }
+                    $totalImportado = count($salvar);
+                    foreach ($salvar as $dados) {
+                        $this->Atendimento->create();
+                        $this->Atendimento->saveAll($dados);
                     }
+
+                    $dataSource->commit();
+                    $this->Session->setFlash($totalImportado, false, false, 'confirma');
+                } catch (Exception $exc) {
+                    $msg = $exc->getMessage();
+                    $dataSource->rollback();
+                    $this->Session->setFlash($msg, 'default', '', 'negar');
                 }
-            }
-
-            try {
-
-                $dataSource->begin();
-
-                $totalImportado = count($salvar);
-                foreach ($salvar as $dados) {
-                    $this->Atendimento->create();
-                    $this->Atendimento->saveAll($dados);
-                }
-
-                $dataSource->commit();
-                $this->Session->setFlash($totalImportado, false, false, 'confirma');
-            } catch (Exception $exc) {
-                $msg = $exc->getMessage();
-                $dataSource->rollback();
-                $this->Session->setFlash($msg, 'default', '', 'negar');
             }
         }
     }
 
     public function listar() {
-
-        $breadcrumb = array(
-            '/' => 'Painel Inicial',
-            '' => 'Lista de demandas'
-        );
-        $this->set(compact('breadcrumb'));
-
         $tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
         $statusAtendimento = $this->StatusAtendimento->find('list', array('fields' => array('status_atendimento_id', 'descricao')));
         $tipoServico = $this->TipoServico->find('list', array('fields' => array('tipo_servico_id', 'descricao')));
@@ -268,9 +165,7 @@ class AtendimentoController extends AppController {
         );
 
         $this->FilterResults->addFilters($optio);
-        $this->FilterResults->setPaginate('limit', 10);
-        $this->FilterResults->setPaginate('group', 'Atendimento.nros');  // optional
-// optional
+        $this->FilterResults->setPaginate('limit', 5);              // optional
         $conditions = $this->FilterResults->getConditions();
         $this->FilterResults->setPaginate('conditions', $conditions);
 
@@ -306,10 +201,8 @@ class AtendimentoController extends AppController {
 
                     $this->Agendamento->saveAll($dados);
                     $this->Atendimento->save($update);
-                    $last_id = $this->Agendamento->id;
-
                     $dataSource->commit();
-                    $retorno = array('msg' => 'Agendamento realizado com sucesso', 'titulo' => 'Sucesso', 'tipo' => 'success','id'=>$last_id);
+                    $retorno = array('msg' => 'Agendamento realizado com sucesso', 'titulo' => 'Sucesso', 'tipo' => 'success');
                     echo json_encode($retorno);
                     die;
                 } catch (Exception $e) {
@@ -345,43 +238,17 @@ class AtendimentoController extends AppController {
         $dados = $this->Session->read('itens');
         /* observacoes,numerorat,itens */
         $form = $this->request->data;
-
-
-        $atendimento = $this->Atendimento->findByatendimento_id($form['Rat']['atendimento_id']);
-
-        if ($atendimento['Atendimento']['status_atendimento_id'] < 3) {
-            $msg = "Não é possível elaborar o preenchimento de RAT esse chamado não foi atribuido a nenhum técnico ou Não foi agendado.";
-            $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
-            echo json_encode($retorno);
-            die;
-        } elseif ($atendimento['Atendimento']['status_atendimento_id'] > 3) {
-            $msg = "O preenchimento dessa RAT já foi realizado.";
-            $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
-            echo json_encode($retorno);
-            die;
-        }
-
-
-        $form['Rat']['data_realizacao'] = $this->formatData($form['Rat']['data_realizacao']);
-
         $update['Atendimento']['atendimento_id'] = $form['Rat']['atendimento_id'];
         $update['Atendimento']['status_atendimento_id'] = '4';
 
-        $tecnico_id = $this->Auth->user('Tecnico.tecnico_id');
-        $form['Rat']['tecnico_id'] = $tecnico_id;
 
-        $Atribuicao = $this->Atribuicao->find('first', array(
-            'conditions' => array('Atribuicao.atendimento_id' => $form['Rat']['atendimento_id']),
-            'order' => 'Atribuicao.data_atribuicao DESC'));
-
+        $Atribuicao = $this->Atribuicao->find('first', array('conditions' => array('Rat.atendimento_id' => $atendimento_id)));
 
 
         /* VERIFICAR RAT É DO TÉCNICO OU O ADMINISTRADOR ESTA ATUANDO NA RAT */
-        if ($this->Auth->user('tipo_usuario_id') == '1' || $Atribuicao['Atribuicao']['tecnico_id'] == $this->Auth->user('Tecnico.tecnico_id')) {
+        if ($this->Auth->user('tipo_usuario_id') == '1' || $Atribuicao['Atribuicao']['tecnico_id'] == $this->Auth->user('tecnico_id')) {
 
             /* VALIDAR PREENCHIMENTO DO CODIGO DA RAT */
-
-
             $this->Rat->set($this->request->data);
 
             if ($this->Rat->validates()) {
@@ -391,19 +258,16 @@ class AtendimentoController extends AppController {
                     /*                     * SALVAR TODOS OS ITENS + NR RAT + DESCRICAO */
                     foreach ($dados as $indice => $content) {
 
+                        $dados[$indice] = $form['Rat'];
+                        $this->MateriaisUtilizado->save($dados);
 
-
-                        $new['MaterialUtilizado'] = $dados[$indice];
-                        $new['MaterialUtilizado']['atendimento_id'] = $form['Rat']['atendimento_id'];
-                        $new['MaterialUtilizado']['tecnico_id'] = $this->Auth->user('Tecnico.tecnico_id');
-                        $this->MaterialUtilizado->create();
-                        $this->MaterialUtilizado->save($new);
+                        /* SUBTRAIR O TOTAL DE DISTRIBUIDOS CONFORME A QUANTIDADE UTILIZADA */
                     }
 
-
-                    $this->Rat->save($form);
-
                     $this->Atendimento->save($update);
+
+
+
                     $transaction->commit();
                     $retorno = array('msg' => 'Relatório técnico gravado com sucesso', 'titulo' => 'Sucesso', 'tipo' => 'success');
                     echo json_encode($retorno);
@@ -418,7 +282,7 @@ class AtendimentoController extends AppController {
                 }
             } else {
 
-                $msg = "O preenchimento do número da RAT é obrigatório";
+                $msg = "O preenchimento do número da RAT é obirgatório";
                 $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
                 echo json_encode($retorno);
                 die;
@@ -490,23 +354,10 @@ class AtendimentoController extends AppController {
 
         $this->layout = null;
 
+        $itensSalvos = $this->MaterialUtilizado->findByatendimento_id($atendimento_id);
+
         $itensSalvos = $this->Session->read('itens');
-
-        $materiais = $this->MaterialUtilizado->find('all', array('conditions' => array('MaterialUtilizado.atendimento_id' => $atendimento_id)));
-
-        if ($materiais) {
-            foreach ($materiais as $indice => $valor) {
-                $itensSalvos[$valor['MaterialUtilizado']['material_id']]['material_utilizado_id'] = $valor['MaterialUtilizado']['material_utilizado_id'];
-                $itensSalvos[$valor['MaterialUtilizado']['material_id']]['atendimento_id'] = $valor['MaterialUtilizado']['atendimento_id'];
-
-                $itensSalvos[$valor['MaterialUtilizado']['material_id']]['material_id'] = $valor['MaterialUtilizado']['material_id'];
-                $itensSalvos[$valor['MaterialUtilizado']['material_id']]['descricao'] = $valor['Material']['descricao'];
-                $itensSalvos[$valor['MaterialUtilizado']['material_id']]['quantidade'] = $valor['MaterialUtilizado']['quantidade'];
-                $itensSalvos[$valor['MaterialUtilizado']['material_id']]['informacoes'] = $valor['MaterialUtilizado']['informacoes'];
-            }
-            $this->Session->write('itens', $itensSalvos);
-        }
-
+        
         $this->set('itens', $itensSalvos);
     }
 
@@ -561,29 +412,6 @@ class AtendimentoController extends AppController {
     public function ajaxRemoverItemRat($indice) {
 
         $dados = $this->Session->read('itens');
-
-        if (isset($dados[$indice]['material_utilizado_id'])) {
-
-
-            $atendimento = $this->Atendimento->findByatendimento_id($dados[$indice]['atendimento_id']);
-
-            if ($atendimento['Atendimento']['status_atendimento_id'] < 3) {
-                $msg = "Não é possível elaborar o preenchimento de RAT esse chamado não foi atribuido a nenhum técnico ou Não foi agendado.";
-                $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
-                echo json_encode($retorno);
-                die;
-            } elseif ($atendimento['Atendimento']['status_atendimento_id'] > 3) {
-                $msg = "O preenchimento dessa RAT já foi realizado. Alterar o status da RAT para realizar a mudança";
-                $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
-                echo json_encode($retorno);
-                die;
-            }
-
-
-            $this->MaterialUtilizado->delete($dados[$indice]['material_utilizado_id']);
-        };
-
-
         unset($dados[$indice]);
         $this->Session->write('itens', $dados);
         die;
@@ -617,20 +445,11 @@ class AtendimentoController extends AppController {
         $update['Atendimento']['atendimento_id'] = $dados['Agendamento']['atendimento_id'];
         $update['Atendimento']['status_atendimento_id'] = '6';
 
-        if ($this->request->is('post')) {
-            try {
-                $this->Atendimento->save($dados);
-                $retorno = array('msg' => 'Finalizado', 'titulo' => 'Sucesso', 'tipo' => 'success');
-                echo json_encode($retorno);
-                die;
-            } catch (Exception $e) {
+        $tecnico_id = $this->Atendimento->findByatendimento_id($dados['Agendamento']['atendimento_id']);
+        $itensUsados = $this->MaterialUtilizado->findByatendimento_id($dados['Agendamento']['atendimento_id']);
 
-                $msg = "Ocorreu um erro ao realizar a atribuição." . $e->getMessage();
-                $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
-                echo json_encode($retorno);
-                die;
-            }
-        }
+        /* Chamar funÃ§Ã£o na controller estoque e subtrair valor de total de materiais utilizados */
+        /* na tabela totalMaterial subtrair o total de material conforme o valor jÃ¡ encontrado dentro da tabela */
     }
 
 }

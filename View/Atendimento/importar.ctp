@@ -49,9 +49,8 @@ if($msg){?>
 				            <label>Tipo de serviço</label>
 
 				            <select id="select2" name="data[Atendimento][tipo_id]" class="form-control">
-				                <option value="1">Instalação</option>
-				                <option value="2">Retirada</option>
-				                <option value="3">Mudança</option>
+				                <option value="1">Rota diaria</option>
+				                <option value="2">BackLog</option>
 				                
 				            </select>
 				          </div> <!-- /.form-group -->

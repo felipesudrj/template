@@ -89,76 +89,39 @@
 				
 				<div class="widget-content">
 					
-					<table class="table table-striped table-bordered">
-						<thead>
-							<tr>
-								<th>Número OS</th>
-								<th>Serviço</th>
-								<th>Status</th>
-								<th class="td-actions"></th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>4458847</td>
-								<td>Instalação</td>
-								<td>Não agendado</td>
-								<td class="td-actions">
-									<a href="/atendimento/visualizar/numeroOS" class="btn btn-xs btn-primary">
-										<i class="btn-icon-only icon-search"></i>										
-									</a>
-								</td>
-							</tr>
-							
-							<tr>
-								<td>887855</td>
-								<td>Retirada</td>
-								<td>Agendado</td>
-								<td class="td-actions">
-									<a href="javascript:;" class="btn btn-xs btn-primary">
-										<i class="btn-icon-only icon-search"></i>										
-									</a>
-								</td>
-							</tr>
-							<tr>
-								<td>778225</td>
-								<td>Instalação</td>
-								<td>Atribuido</td>
-								<td class="td-actions">
-									<a href="javascript:;" class="btn btn-xs btn-primary">
-										<i class="btn-icon-only icon-search"></i>										
-									</a>
-								</td>
-							</tr>
-							<tr>
-								<td>Trident</td>
-								<td>Trident</td>
-								<td>Internet
-									 Explorer 4.0</td>
-								<td class="td-actions">
-									<a href="javascript:;" class="btn btn-xs btn-primary">
-										<i class="btn-icon-only icon-search"></i>										
-									</a>
-								</td>
-							</tr>
-							<tr>
-								<td>Trident</td>
-								<td>Trident</td>
-								<td>Internet
-									 Explorer 4.0</td>
-								<td class="td-actions">
-									<a href="javascript:;" class="btn btn-xs btn-primary">
-										<i class="btn-icon-only icon-search"></i>										
-									</a>
-								</td>
-							</tr>
-							</tbody>
-							<footer>
-							<tr>
-							<td colspan="4"><a href="/atendimento/listar"><span class="pull-right badge badge-important">Ver todos</span></a></td>
-							</tr>
-							</footer>
-						</table>
+					 <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Número OS</th>
+                            <th>Serviço</th>
+                            <th>Status</th>
+                            <th>Data de agendamento</th>
+                            <th class="td-actions"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($atendimento as $indice => $valor) { ?>
+                            <tr>
+                                <td><?php echo $valor['Atendimento']['nros'];?></td>
+                                <td><?php echo $valor['TipoServico']['descricao'];?></td>
+                                 <td><?php echo $valor['StatusAtendimento']['descricao'];?></td>
+                                   <td><?php echo $valor['Agendamento']['data_agendamento'];?></td>
+                                <td class="td-actions">
+                                    <a href="/atendimento/alterar/<?php echo $valor['Atendimento']['atendimento_id'];?>#dadosos" class="btn btn-xs btn-primary">
+                                        <i class="btn-icon-only icon-search">VER</i>										
+                                    </a>
+
+                                </td>
+                            </tr>
+                        <?php } ?>
+
+                    </tbody>
+                    <footer>
+                        <tr>
+                            <td colspan="5"><a href="/atendimento/listar"><span class="pull-right badge badge-important">Ver todos</span></a></td>
+                        </tr>
+                    </footer>
+                </table>
 					
 				</div> <!-- /widget-content -->
 			

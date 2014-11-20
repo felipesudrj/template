@@ -55,41 +55,12 @@ class TecnicoController extends AppController {
         }
     }
 
-	public function excluir($id){
-	
-		try{
-		$this->Usuario->delete($id);
-		$this->Session->setFlash("Excluido com sucesso.", false, false, 'confirma');
-        $this->redirect(array('action'=>'listar'));
-		}catch (Exception $e) {
-					$msg = "Não foi possível excluir esse usuário. "
-                    $msg .= $e->getMessage();
-                    $this->Session->setFlash($msg, false, false, 'negar');
-                    $this->redirect(array('action'=>'listar');
-                }
-	}
-   
-    public function listar() {
-		$tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
-
-		$optio = array(
-                        'tecnico' => array(
-                            'Tecnico.tecnico_id' => array(
-                                'operator' => '=',
-                                'select' => $this->FilterResults->select('Todos', $tecnicos)
-                            )
-                        )
-                );
+    public function editar() {
         
-        $this->FilterResults->addFilters($optio);
-        $this->FilterResults->setPaginate('limit', 5);              // optional
-        $conditions = $this->FilterResults->getConditions();
-        $this->FilterResults->setPaginate('conditions', $conditions);
+    }
 
-        $tecnicos = $this->Paginate('Tecnico');
-
-        $this->set('tecnicos', $tecnicos);
-		
+    public function listar() {
+        
     }
 
 }

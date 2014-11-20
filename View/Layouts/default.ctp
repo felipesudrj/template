@@ -27,7 +27,7 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
         ?>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="apple-mobile-web-app-capable" content="yes">    
-        <!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet">-->
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet">
 
         <?php
         echo $this->Html->css(
@@ -136,8 +136,8 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
                                     </a>	    
 
                                     <ul class="dropdown-menu">
-                                        <li><a href="/estoque/cadastrar">Cadastrar novo item</a></li>
-                                        <li><a href="/estoque/listar">Listagem de items</a></li>
+                                        <li><a href="/estoque/cadastrarmaterial">Cadastrar novo item</a></li>
+                                        <li><a href="/estoque/listarmaterial">Listagem de items</a></li>
                                         <li><a href="/estoque/relatorio">Controle de estoque</a></li>
 
                                     </ul> 				
