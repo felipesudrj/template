@@ -192,4 +192,38 @@ class EstoqueController extends AppController {
         /* IMPRIMIR LISTA DE MATERIAIS ENTREGUES AO TÉCNICO */
     }
 
+public function listadistribuido(){
+
+	$tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
+	
+	$optio = array(
+            'tecnico_id' => array(
+                'MaterialDistribuido.tecnico_id' => array(
+                    'operator' => 'LIKE',
+					'select' => $this->FilterResults->select('Selecione um técnico', $tecnicos)
+
+                ),
+			'data_retirada' => array(
+                'MaterialDistribuido.data' => array(
+                    'operator' => '='
+                ),
+			'protocolo' => array(
+                'MaterialDistribuido.protocolo' => array(
+                    'operator' => '='
+                ),
+			 
+            )
+        );
+        $this->FilterResults->addFilters($optio);
+
+        $this->FilterResults->setPaginate('limit', 10);
+		$this->FilterResults->setPaginate('group', array('MaterialDistribuido.protocolo'));
+        $conditions = $this->FilterResults->getConditions();
+        $this->FilterResults->setPaginate('conditions', $conditions);
+        $protocolos = $this->Paginate('MaterialDistribuido');
+		$this->set('protocolos',$protocolos);
+	
+	
+	}
+
 }
