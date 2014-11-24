@@ -28,9 +28,23 @@ class Atendimento extends AppModel {
                  'foreignKey' => 'atendimento_id',
                  'order' => 'Agendamento.data_agendamento DESC',
                  'limit' => '1',
+             
+           ),
+              'Rat'=>array(
+                 'className' => 'Rat',
+                 'foreignKey' => 'atendimento_id',
+                 'order' => 'Rat.data_realizacao DESC',
+                 'limit' => '1',
+             
            )
              
              
+         );
+         public $hasMany = array(
+             'MaterialUtilizado' => array(
+                 'className' => 'MaterialUtilizado',
+                 'foreignKey' => 'atendimento_id',
+            )
          );
          public $belongsTo = array(
             'StatusAtendimento' => array(

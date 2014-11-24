@@ -22,11 +22,6 @@ class Agendamento extends AppModel {
                         'required' => true,
                         'rule'=>array('notEmpty'),
                         'message'=>"Preencher o campo contato"
-                   ),
-                'observacoes'=>array(
-                        'required' => true,
-                        'rule'=>array('notEmpty'),
-                        'message'=>"Preencher o campo obervações"
                    )
             );
 

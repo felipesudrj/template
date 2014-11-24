@@ -16,7 +16,7 @@ App::import('Vendor', 'ex/simplexlsx');
 class AtendimentoController extends AppController {
 
     public $uses = array(
-        'Atendimento', 'TipoServico', 'StatusAtendimento', 'Rat',
+        'Atendimento', 'TipoServico', 'StatusAtendimento', 'Rat','Importacao',
         'Agendamento', 'Atribuicao', 'Tecnico', 'MaterialDistribuido', 'MaterialUtilizado');
     public $components = array('Session');
 
@@ -84,6 +84,7 @@ class AtendimentoController extends AppController {
         $this->set(compact('breadcrumb'));
 
         $atendimento = $this->Atendimento->findByatendimento_id($atendimento_id);
+
         $this->request->data = $atendimento;
         $tipoServico = $this->TipoServico->find('list', array('fields' => array('tipo_servico_id', 'descricao')));
         $statusAtendimento = $this->StatusAtendimento->find('list', array('fields' => array('status_atendimento_id', 'descricao')));
@@ -140,86 +141,199 @@ class AtendimentoController extends AppController {
             $arquivo = $this->request->data['Atendimento']['file']['tmp_name'];
             $xlsx = new SimpleXLSX($arquivo);
             $dados = $xlsx->rows();
+            
+            $protocolo = date('YmdHis');
+            $totalImportado = 0;
+            $repetidos = array();
             if ($this->request->data['Atendimento']['tipo_id'] == 1) {
                 foreach ($dados as $indice => $valor) {
+                    
+                   
+                    if (!empty($valor['3'])) {
+                        
+                            if ($indice != 0) {
 
-                    if (!empty($valor['2'])) {
-
-                        if ($indice != 0) {
-
-
-                            $salvar[$indice]['Atendimento']['nros'] = $valor['2']; /* Ordem de servico */
-                            $salvar[$indice]['Atendimento']['nrcontrato'] = $valor['4']; /* Contrato */
-                            $salvar[$indice]['Atendimento']['observacoes'] = $valor['19']; /* observacoes */
-                            $salvar[$indice]['Atendimento']['tipo_servico_id'] = 1; /* observacoes */
-                            $salvar[$indice]['Atendimento']['tarefa'] = $valor['13']; /* Tarefa */
-                            $salvar[$indice]['Atendimento']['periodo'] = $valor['14']; /* Periodo */
-                            $salvar[$indice]['Atendimento']['status_atendimento_id'] = 1; /* status atendimento id */
+                                $salvar['Atendimento']['protocolo']= $protocolo;
+                                $salvar['Atendimento']['nros'] = $valor['2']; /* Ordem de servico */
+                                $salvar['Atendimento']['nrcontrato'] = $valor['4']; /* Contrato */
+                                $salvar['Atendimento']['observacoes'] = $valor['19']; /* observacoes */
+                                $salvar['Atendimento']['tarefa'] = $valor['13']; /* Tarefa */
+                                $salvar['Atendimento']['periodo'] = $valor['14']; /* Periodo */
 
 
-                            $salvar[$indice]['Cliente']['nome'] = $valor['5']; /* Cliente */
-                            $salvar[$indice]['Cliente']['logradouro'] = $valor['6']; /* Logradouro */
-                            $salvar[$indice]['Cliente']['numero'] = $valor['7']; /* Numero */
-                            $salvar[$indice]['Cliente']['complemento'] = $valor['8']; /* Complemento */
-                            $salvar[$indice]['Cliente']['bairro'] = $valor['9']; /* Bairro */
-                            $salvar[$indice]['Cliente']['cidade'] = $valor['10']; /* Cidade */
-                            $salvar[$indice]['Cliente']['telefone1'] = $valor['16']; /* Fone */
-                            $salvar[$indice]['Cliente']['telefone2'] = $valor['17']; /* Fone */
-                            $salvar[$indice]['Cliente']['telefone3'] = $valor['18']; /* Fone */
-                        }
+                                switch ($valor['12']) {
+                                    case 'Habilitação': $tipo_servico = 1;
+                                        break;
+                                    case '001 - Habilitação':$tipo_servico = 1;
+                                        break;
+                                    case 'Retirada de Equipamento': $tipo_servico = 2;
+                                        break;
+                                    case '002 - Retirada de Equipamento':$tipo_servico = 2;
+                                        break;
+                                    case 'Habilitação Ponto Adicionar': $tipo_servico = 4;
+                                        break;
+                                    
+                                    case '003 - Habilitação de Ponto Adicional':$tipo_servico = 4;
+                                        break;
+                                }
+                                $salvar['Atendimento']['tipo_servico_id'] = $tipo_servico; /* observacoes */
+
+
+                                $salvar['Cliente']['nome'] = $valor['5']; /* Cliente */
+                                $salvar['Cliente']['logradouro'] = $valor['6']; /* Logradouro */
+                                $salvar['Cliente']['numero'] = $valor['7']; /* Numero */
+                                $salvar['Cliente']['complemento'] = $valor['8']; /* Complemento */
+                                $salvar['Cliente']['bairro'] = $valor['9']; /* Bairro */
+                                $salvar['Cliente']['cidade'] = $valor['10']; /* Cidade */
+                                $salvar['Cliente']['estado'] = ''; /* Cidade */
+                                $salvar['Cliente']['telefone1'] = $valor['16']; /* Fone */
+                                $salvar['Cliente']['telefone2'] = $valor['17']; /* Fone */
+                                $salvar['Cliente']['telefone3'] = $valor['18']; /* Fone */
+
+                                /* CRIAR AGENDAMENTO */
+                                if ($valor['5'] == "AG") {
+                                    $valor['6'] = date('Y-m-d', strtotime('+1 day', $xlsx->unixstamp($valor['6'])));
+                                   
+                                    $salvar['Atendimento']['status_atendimento_id'] = 2; /* status atendimento id */
+                                    $salvar['Agendamento']['data_agendamento'] = $valor['6'];
+                                    $salvar['Agendamento']['contato'] = $valor['14'];
+                                    
+                                    
+                                } else {
+                                    
+                                    $salvar['Atendimento']['status_atendimento_id'] = 1; /* status atendimento id */
+                                
+                                }
+                                
+                                
+                                try {
+                                    $dataSource->begin();
+                                    $this->Atendimento->create();
+                                    $this->Atendimento->saveAll($salvar);
+                                    $dataSource->commit();
+                                    $totalImportado++;
+                                    
+                                    
+                                } catch(Exception $exc) {
+                                    
+                                    $atendimento = $this->Atendimento->findBynros($salvar['Atendimento']['nros']);
+
+                                    $repetidos[$indice] = $atendimento;
+
+                                    $msg = $exc->getMessage();
+                                    $dataSource->rollback();
+                                }
+                            }
+                        
                     }
-                }
-            } else {
+                } /* foreach */
+            }else{
+               
+            
                 foreach ($dados as $indice => $valor) {
-
                     
-                    
-                    if (!empty($valor['2'])) {
+                   pr($valor);
+                   die;
+                    if (!empty($valor['3'])) {
+                        
+                            if ($indice != 0) {
 
-                        if ($indice != 0) {
+                                $salvar['Atendimento']['protocolo']= $protocolo;
+                                $salvar['Atendimento']['nros'] = $valor['2']; /* Ordem de servico */
+                                $salvar['Atendimento']['nrcontrato'] = $valor['4']; /* Contrato */
+                                $salvar['Atendimento']['observacoes'] = $valor['19']; /* observacoes */
+                                $salvar['Atendimento']['tarefa'] = $valor['13']; /* Tarefa */
+                                $salvar['Atendimento']['periodo'] = $valor['14']; /* Periodo */
 
 
-                            $salvar[$indice]['Atendimento']['nros'] = $valor['2']; /* Ordem de servico */
-                            $salvar[$indice]['Atendimento']['nrcontrato'] = $valor['4']; /* Contrato */
-                            $salvar[$indice]['Atendimento']['observacoes'] = $valor['19']; /* observacoes */
-                            $salvar[$indice]['Atendimento']['tipo_servico_id'] = 1; /* observacoes */
-                            $salvar[$indice]['Atendimento']['tarefa'] = $valor['13']; /* Tarefa */
-                            $salvar[$indice]['Atendimento']['periodo'] = $valor['14']; /* Periodo */
-                            $salvar[$indice]['Atendimento']['status_atendimento_id'] = 1; /* status atendimento id */
+                                switch ($valor['12']) {
+                                    case 'Habilitação': $tipo_servico = 1;
+                                        break;
+                                    case '001 - Habilitação':$tipo_servico = 1;
+                                        break;
+                                    case 'Retirada de Equipamento': $tipo_servico = 2;
+                                        break;
+                                    case '002 - Retirada de Equipamento':$tipo_servico = 2;
+                                        break;
+                                    case 'Habilitação Ponto Adicionar': $tipo_servico = 4;
+                                        break;
+                                    
+                                    case '003 - Habilitação de Ponto Adicional':$tipo_servico = 4;
+                                        break;
+                                }
+                                $salvar['Atendimento']['tipo_servico_id'] = $tipo_servico; /* observacoes */
 
 
-                            $salvar[$indice]['Cliente']['nome'] = $valor['5']; /* Cliente */
-                            $salvar[$indice]['Cliente']['logradouro'] = $valor['6']; /* Logradouro */
-                            $salvar[$indice]['Cliente']['numero'] = $valor['7']; /* Numero */
-                            $salvar[$indice]['Cliente']['complemento'] = $valor['8']; /* Complemento */
-                            $salvar[$indice]['Cliente']['bairro'] = $valor['9']; /* Bairro */
-                            $salvar[$indice]['Cliente']['cidade'] = $valor['10']; /* Cidade */
-                            $salvar[$indice]['Cliente']['telefone1'] = $valor['16']; /* Fone */
-                            $salvar[$indice]['Cliente']['telefone2'] = $valor['17']; /* Fone */
-                            $salvar[$indice]['Cliente']['telefone3'] = $valor['18']; /* Fone */
-                        }
+                                $salvar['Cliente']['nome'] = $valor['5']; /* Cliente */
+                                $salvar['Cliente']['logradouro'] = $valor['6']; /* Logradouro */
+                                $salvar['Cliente']['numero'] = $valor['7']; /* Numero */
+                                $salvar['Cliente']['complemento'] = $valor['8']; /* Complemento */
+                                $salvar['Cliente']['bairro'] = $valor['9']; /* Bairro */
+                                $salvar['Cliente']['cidade'] = $valor['10']; /* Cidade */
+                                $salvar['Cliente']['estado'] = ''; /* Cidade */
+                                $salvar['Cliente']['telefone1'] = $valor['16']; /* Fone */
+                                $salvar['Cliente']['telefone2'] = $valor['17']; /* Fone */
+                                $salvar['Cliente']['telefone3'] = $valor['18']; /* Fone */
+
+                                /* CRIAR AGENDAMENTO */
+                                if ($valor['5'] == "AG") {
+                                    $valor['6'] = date('Y-m-d', strtotime('+1 day', $xlsx->unixstamp($valor['6'])));
+                                   
+                                    $salvar['Atendimento']['status_atendimento_id'] = 2; /* status atendimento id */
+                                    $salvar['Agendamento']['data_agendamento'] = $valor['6'];
+                                    $salvar['Agendamento']['contato'] = $valor['14'];
+                                    
+                                    
+                                } else {
+                                    
+                                    $salvar['Atendimento']['status_atendimento_id'] = 1; /* status atendimento id */
+                                
+                                }
+                                
+                                
+                                try {
+                                    $dataSource->begin();
+                                    $this->Atendimento->create();
+                                    $this->Atendimento->saveAll($salvar);
+                                    $dataSource->commit();
+                                    $totalImportado++;
+                                    
+                                    
+                                } catch(Exception $exc) {
+                                    
+                                    $atendimento = $this->Atendimento->findBynros($salvar['Atendimento']['nros']);
+
+                                    $repetidos[$indice] = $atendimento;
+
+                                    $msg = $exc->getMessage();
+                                    $dataSource->rollback();
+                                }
+                            }
+                        
                     }
-                }
-            }
-
-            try {
-
-                $dataSource->begin();
-
-                $totalImportado = count($salvar);
-                foreach ($salvar as $dados) {
-                    $this->Atendimento->create();
-                    $this->Atendimento->saveAll($dados);
-                }
-
-                $dataSource->commit();
-                $this->Session->setFlash($totalImportado, false, false, 'confirma');
-            } catch (Exception $exc) {
-                $msg = $exc->getMessage();
-                $dataSource->rollback();
-                $this->Session->setFlash($msg, 'default', '', 'negar');
-            }
+                } /* foreach */
+                
+            } /* if tipo */
+            
+            
+            $total = count($repetidos);
+            
+            
+            
+            $this->set('totalImportado',$totalImportado);
+            $this->set('total', $total);
+            $this->set('repetidos', $repetidos);
         }
+    }
+
+    private function insertAgendamento($id, $data) {
+
+        $agendamento['Agendamento']['atendimento_id'] = $id;
+        $agendamento['Agendamento']['data_agendamento'] = $data;
+
+        $this->Agendamento->create();
+        $this->Agendamento->save($agendamentoag);
+        return true;
     }
 
     public function listar() {
@@ -309,7 +423,7 @@ class AtendimentoController extends AppController {
                     $last_id = $this->Agendamento->id;
 
                     $dataSource->commit();
-                    $retorno = array('msg' => 'Agendamento realizado com sucesso', 'titulo' => 'Sucesso', 'tipo' => 'success','id'=>$last_id);
+                    $retorno = array('msg' => 'Agendamento realizado com sucesso', 'titulo' => 'Sucesso', 'tipo' => 'success', 'id' => $last_id);
                     echo json_encode($retorno);
                     die;
                 } catch (Exception $e) {
@@ -614,18 +728,33 @@ class AtendimentoController extends AppController {
     public function ajaxFinalizar() {
 
         $dados = $this->request->data;
-        $update['Atendimento']['atendimento_id'] = $dados['Agendamento']['atendimento_id'];
-        $update['Atendimento']['status_atendimento_id'] = '6';
+        $dados['Atendimento']['status_atendimento_id'] = '5';
+        $dados['Atendimento']['data_finaliza'] = date('Y-m-d');
+
+        $atendimento = $this->Atendimento->findByatendimento_id($dados['Atendimento']['atendimento_id']);
+
 
         if ($this->request->is('post')) {
-            try {
-                $this->Atendimento->save($dados);
-                $retorno = array('msg' => 'Finalizado', 'titulo' => 'Sucesso', 'tipo' => 'success');
-                echo json_encode($retorno);
-                die;
-            } catch (Exception $e) {
 
-                $msg = "Ocorreu um erro ao realizar a atribuição." . $e->getMessage();
+
+            if ($atendimento['Atendimento']['status_atendimento_id'] >= 4) {
+
+                try {
+                    $this->Atendimento->save($dados);
+                    $retorno = array('msg' => 'Ordem de serviço finalizada com sucesso', 'titulo' => 'Sucesso', 'tipo' => 'success');
+                    echo json_encode($retorno);
+                    die;
+                } catch (Exception $e) {
+
+                    $msg = "Ocorreu um erro ao finalizar essa ordem de serviço." . $e->getMessage();
+                    $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
+                    echo json_encode($retorno);
+                    die;
+                }
+            } else {
+
+
+                $msg = "Esse chamado não pode ser finalizado, altere o status do atendimento para finaliza-lo.";
                 $retorno = array('msg' => $msg, 'titulo' => 'Erro', 'tipo' => 'error');
                 echo json_encode($retorno);
                 die;

@@ -21,14 +21,14 @@
 							<span class="shortcut-label">Importar Ordem de serviço</span>
 						</a>
 						
-						<a href="/atendimento/listar" class="shortcut">
+						<a href="/atendimento/listar/Wm1sc2RHVnlMbTV5YjNNPQ==:/Wm1sc2RHVnlMblJwY0c5VFpYSjJhV052:/Wm1sc2RHVnlMbTV2YldWRGJHbGxiblJs:/Wm1sc2RHVnlMblJsWTI1cFkyOD0=:/Wm1sc2RHVnlMbk4wWVhSMWMwRjBaVzVrYVcxbGJuUnY=:TVE9PQ%3D%3D" class="shortcut">
 							<i class="shortcut-icon icon-calendar"></i>
 							<span class="shortcut-label">Agendar Atendimento</span>								
 						</a>
 						
 						
 						
-						<a href="/atendimento/listar" class="shortcut">
+						<a href="/atendimento/listar/Wm1sc2RHVnlMbTV5YjNNPQ==:/Wm1sc2RHVnlMblJwY0c5VFpYSjJhV052:/Wm1sc2RHVnlMbTV2YldWRGJHbGxiblJs:/Wm1sc2RHVnlMblJsWTI1cFkyOD0=:/Wm1sc2RHVnlMbk4wWVhSMWMwRjBaVzVrYVcxbGJuUnY=:TWc9PQ%3D%3D" class="shortcut">
 							<i class="shortcut-icon icon-external-link"></i>
 							<span class="shortcut-label">Atribuir Serviços aos técnicos</span>								
 						</a>
@@ -38,17 +38,17 @@
 							<span class="shortcut-label">Relatórios de atendimento</span>	
 						</a>
 						
-						<a href="/tecnico/cadastrar" class="shortcut">
+						<a href="/estoque/distribuir" class="shortcut">
 							<i class="shortcut-icon icon-user"></i>
-							<span class="shortcut-label">Cadastro de técnicos</span>
+							<span class="shortcut-label">Distribuição de Material</span>
 						</a>
 						
-						<a href="/estoque/cadastrar" class="shortcut">
+						<a href="/estoque/cadastrarmaterial" class="shortcut">
 							<i class="shortcut-icon icon-file"></i>
 							<span class="shortcut-label">Cadastrar Equipamentos</span>	
 						</a>
 						
-						<a href="/estoque/listar" class="shortcut">
+						<a href="/estoque/listarmaterial" class="shortcut">
 							<i class="shortcut-icon icon-tasks"></i>
 							<span class="shortcut-label">Controle de estoque</span>	
 						</a>

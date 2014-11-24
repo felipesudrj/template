@@ -19,7 +19,7 @@ if($msg){?>
             </div>
 <?php }?>
 
-<div class="row">
+
 
       	<div class="col-md-12">
 
@@ -70,6 +70,42 @@ if($msg){?>
       		</div> <!-- /.widget -->
 
       	</div> <!-- /.col-md-12 -->
-
-
-      </div>
+        
+        
+        <div class="col-md-12">
+                    <?php if(!empty($totalImportado)){?>
+            <div class="alert alert-success">
+                <h4><strong>Total de OS importadas: </strong><?php echo $totalImportado; ?> </h4>
+            </div>
+                    <?php }?>
+        </div>
+        
+        <?php if(!empty($repetidos)){?>
+        <div class="col-md-12">
+            <div class="alert alert-danger">
+                <h4><strong>Atenção: </strong><?php echo $total; ?> ordens de serviço não foram importadas pois     já constam na base de dados.</h4>
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td>N. OS</td>
+                        <td>Contrato</td>
+                        <td>Nome do cliente</td>
+                        <td>Status do atendimento</td>
+                        <td>Tipo de serviço</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($repetidos as $indice=>$valor){ ?>
+                    <tr>
+                        <td><?php echo $valor['Atendimento']['nros'];?></td>
+                        <td><?php echo $valor['Atendimento']['nrcontrato'];?></td>
+                        <td><?php echo $valor['Cliente']['nome'];?></td>
+                        <td><?php echo $valor['StatusAtendimento']['descricao'];?></td>
+                        <td><?php echo $valor['TipoServico']['descricao'];?></td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+        <?php } ?>

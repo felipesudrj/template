@@ -117,6 +117,8 @@
                                                 break;
                                             case 4:$label = "label-success";
                                                 break;
+                                            default :$label = "label-default";
+                                                break;
                                         }
                                         ?>
                                         <span class="label <?php echo $label; ?>"><?php echo $dados['StatusAtendimento']['descricao']; ?></span>
@@ -144,6 +146,13 @@
                                             <a href="/atendimento/alterar/<?php echo $dados['Atendimento']['atendimento_id']; ?>#finalizar" class="badge "><i class="icon-list"></i> Finaliza demanda</a>
 
                                         <?php } ?>
+                                            
+                                        
+                                        <?php if ($dados['StatusAtendimento']['status_atendimento_id'] >= 5) { ?>
+
+                                            <a href="/relatorio/ordem/<?php echo $dados['Atendimento']['atendimento_id']; ?>#finalizar" class="badge "><i class="icon-print"></i> Imprimir</a>
+
+                                        <?php } ?>    
                                     </td>
                                 </tr>
                             <?php } ?>

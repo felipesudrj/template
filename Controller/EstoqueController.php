@@ -15,7 +15,7 @@ App::uses('AppController', 'Controller');
 class EstoqueController extends AppController {
 
     public $uses = array(
-        'Atendimento', 'Material', 'MaterialDistribuido', 'MaterialUtilizado', 'TotalMaterial', 'UnidadeMedida');
+        'Atendimento', 'Material', 'Tecnico', 'MaterialDistribuido', 'MaterialUtilizado', 'TotalMaterial', 'UnidadeMedida');
 
     public function cadastrarmaterial($id = null) {
 
@@ -65,7 +65,11 @@ class EstoqueController extends AppController {
 
     public function listarmaterial() {
 
-
+        $breadcrumb = array(
+            '/' => 'Painel Inicial',
+            '/estoque/listarmaterial' => 'Lista de materiais'
+        );
+        $this->set(compact('breadcrumb'));
         $optio = array(
             'descricao' => array(
                 'Material.descricao' => array(
@@ -82,8 +86,11 @@ class EstoqueController extends AppController {
         $materiais = $this->Paginate('Material');
 
         foreach ($materiais AS $indice => $valor) {
-
-            $materiais[$indice]['Material']['total'] = $this->TotalMaterial->totalMaterial($valor['Material']['material_id']);
+            $estoque = $this->TotalMaterial->totalMaterial($valor['Material']['material_id']);
+            $distribuido = $this->MaterialDistribuido->totalMaterial($valor['Material']['material_id']);
+            $materiais[$indice]['Material']['totalestoque'] = $estoque;
+            $materiais[$indice]['Material']['totaldistribuido'] = $distribuido;
+            $materiais[$indice]['Material']['total'] = $estoque - $distribuido;
         }
 
 
@@ -113,10 +120,9 @@ class EstoqueController extends AppController {
 
     public function distribuir() {
 
-        $materiais = $this->Material->find('list');
+        $materiais = $this->Material->find('all', array());
         $tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
         $this->set(compact('materiais', 'tecnicos'));
-
         if ($this->request->is('post')) {
 
             $dataSource = $this->MaterialDistribuido->getDataSource();
@@ -128,26 +134,43 @@ class EstoqueController extends AppController {
                 $dataSource->begin();
 
                 try {
-
+                    $protocolo = date('YmdHis');
                     foreach ($itens as $indice => $valor) {
+                        $saveMaterialDistribuido['MaterialDistribuido']['data_retirada'] = date('Y-m-d');
 
+                        $saveMaterialDistribuido['MaterialDistribuido']['protocolo'] = $protocolo;
                         $saveMaterialDistribuido['MaterialDistribuido']['material_id'] = $valor['material_id'];
-                        $saveMaterialDistribuido['MaterialDistribuido']['tecnico_id'] = $valor['tecnico_id'];
+                        $saveMaterialDistribuido['MaterialDistribuido']['tecnico_id'] = $this->request->data['MaterialDistribuido']['tecnico_id'];
                         $saveMaterialDistribuido['MaterialDistribuido']['quantidade'] = $valor['quantidade'];
                         $saveMaterialDistribuido['MaterialDistribuido']['informacoes'] = $valor['informacoes'];
-
                         $this->MaterialDistribuido->create();
                         $this->MaterialDistribuido->save($saveMaterialDistribuido);
                     }
 
                     $dataSource->commit();
+
+                    $this->layout = null;
+                    $this->set('protocolo', $protocolo);
+                    $this->set('tecnico', $tecnicos[$this->request->data['MaterialDistribuido']['tecnico_id']]);
+                    $this->set('itens', $itens);
+                    $this->render('imprimirlista');
+                    $this->Session->delete('itens');
                 } catch (Exception $e) {
 
                     $dataSource->rollback();
+                    $msg = $exc->getMessage();
+                    $this->Session->setFlash($msg, false, false, 'negar');
+                    $this->redirect('/estoque/listarmaterial');
                 }
             }
             /* REGISTRAR A OPERACAO NA TABELA DE TotalMaterial */
+        } else {
+            $this->Session->delete('itens');
         }
+    }
+
+    public function relatoriotecnico() {
+        
     }
 
     public function ajaxIncluirItem() {
@@ -156,20 +179,44 @@ class EstoqueController extends AppController {
 
         if ($this->request->is('post')) {
 
+            if (empty($this->request->data['material_id'])) {
+                $retorno = array('msg' => 'Selecione um tipo de material', 'titulo' => 'Erro', 'tipo' => 'error');
+                echo json_encode($retorno);
+                die;
+            } else if (empty($this->request->data['quantidade'])) {
+                $retorno = array('msg' => 'Informe a quantidade de materiais', 'titulo' => 'Erro', 'tipo' => 'error');
+                echo json_encode($retorno);
+                die;
+            }
 
 
-            if ($this->Session->read('itens')) {
+            $existe = $this->Session->read('itens');
 
-                $dados = array('material_id' => $_post['material_id'], 'descricao' => $_post['descricao'], 'quantidade' => $_post['quantidade'], 'informacoes' => $_post['informacoes']);
-                $novoItem[] = $this->Session->read('itens');
-                $novoItem[] = $dados;
-                $itens = $this->Session->write('itens', $novoItem);
+            if ($existe) {
+
+
+                $dados = array(
+                    'material_id' => $this->request->data['material_id'],
+                    'descricao' => trim($this->request->data['descricao']),
+                    'quantidade' => trim($this->request->data['quantidade']),
+                    'informacoes' => trim($this->request->data['informacoes']));
+                $novoItem = $this->Session->read('itens');
+                $novoItem[$this->request->data['material_id']] = $dados;
+                $this->Session->write('itens', $novoItem);
+                $retorno = array('msg' => 'Item adicionado', 'titulo' => 'Sucesso', 'tipo' => 'success');
+                echo json_encode($retorno);
+                die;
             } else {
-                $dados['0']['material_id'] = $_post['material_id'];
-                $dados['0']['quantidade'] = $_post['quantidade'];
-                $dados['0']['informacoes'] = $_post['informacoes'];
-                $dados['0']['descricao'] = $_post['descricao'];
+
+
+                $dados[$this->request->data['material_id']]['material_id'] = $this->request->data['material_id'];
+                $dados[$this->request->data['material_id']]['quantidade'] = trim($this->request->data['quantidade']);
+                $dados[$this->request->data['material_id']]['informacoes'] = trim($this->request->data['informacoes']);
+                $dados[$this->request->data['material_id']]['descricao'] = trim($this->request->data['descricao']);
                 $novoItem = $this->Session->write('itens', $dados);
+                $retorno = array('msg' => 'Item adicionado', 'titulo' => 'Sucesso', 'tipo' => 'success');
+                echo json_encode($retorno);
+                die;
             }
         }
     }
@@ -179,12 +226,17 @@ class EstoqueController extends AppController {
         $dados = $this->Session->read('itens');
         unset($dados[$indice]);
         $this->Session->write('itens', $dados);
+
+        $retorno = array('msg' => 'Item removido', 'titulo' => 'Erro', 'tipo' => 'error');
+        echo json_encode($retorno);
+
         die;
     }
 
     public function ajaxVisualizaTabelaItens() {
         $this->layout = null;
         $itensSalvos = $this->Session->read('itens');
+
         $this->set('itens', $itensSalvos);
     }
 
@@ -192,38 +244,56 @@ class EstoqueController extends AppController {
         /* IMPRIMIR LISTA DE MATERIAIS ENTREGUES AO TÉCNICO */
     }
 
-public function listadistribuido(){
-
-	$tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
-	
-	$optio = array(
-            'tecnico_id' => array(
-                'MaterialDistribuido.tecnico_id' => array(
-                    'operator' => 'LIKE',
-					'select' => $this->FilterResults->select('Selecione um técnico', $tecnicos)
-
-                ),
-			'data_retirada' => array(
-                'MaterialDistribuido.data' => array(
-                    'operator' => '='
-                ),
-			'protocolo' => array(
-                'MaterialDistribuido.protocolo' => array(
-                    'operator' => '='
-                ),
-			 
-            )
+    public function gerenciar($material_id) {
+        $breadcrumb = array(
+            '/' => 'Painel Inicial',
+            '/estoque/listarmaterial' => 'Lista de materiais',
+            '' => 'Gerenciar Material'
         );
-        $this->FilterResults->addFilters($optio);
+        $this->set(compact('breadcrumb'));
 
-        $this->FilterResults->setPaginate('limit', 10);
-		$this->FilterResults->setPaginate('group', array('MaterialDistribuido.protocolo'));
-        $conditions = $this->FilterResults->getConditions();
-        $this->FilterResults->setPaginate('conditions', $conditions);
-        $protocolos = $this->Paginate('MaterialDistribuido');
-		$this->set('protocolos',$protocolos);
-	
-	
-	}
+        $material = $this->TotalMaterial->find('first', array('conditions' => array('TotalMaterial.material_id' => $material_id)));
+
+        $distribuido = $this->MaterialDistribuido->find('first', array('conditions' => array('MaterialDistribuido.material_id' => $material_id)));
+
+        $total = $material['TotalMaterial']['TotalMaterial'] - $distribuido['MaterialDistribuido']['TotalDistribuido'];
+
+        $this->set('total', $total);
+        $this->set('material', $material);
+        $this->set('material_id', $material_id);
+
+
+
+
+        if ($this->request->is('post')) {
+
+            $dataSource = $this->TotalMaterial->getDataSource();
+
+            $this->request->data['TotalMaterial']['tecnico_id'] = $this->Auth->user('Tecnico.tecnico_id');
+            $this->request->data['MaterialDistribuido']['tecnico_id'] = $this->Auth->user('Tecnico.tecnico_id');
+
+            $dataSource->begin();
+            try {
+
+                if (!empty($this->request->data['MaterialDistribuido']['quantidade'])) {
+                    $this->MaterialDistribuido->save($this->request->data);
+                }
+
+                if (!empty($this->request->data['TotalMaterial']['quantidade'])) {
+                    $this->TotalMaterial->save($this->request->data);
+                }
+
+                $dataSource->commit();
+                $this->Session->setFlash('Estoque atualizado com sucesso.', false, false, 'confirmar');
+                $this->redirect(array('action' => 'listarmaterial'));
+            } catch (Exception $exc) {
+
+                $dataSource->rollback();
+                $msg = $exc->getMessage();
+                $this->Session->setFlash($msg, false, false, 'negar');
+                $this->redirect(array('action' => 'listarmaterial'));
+            }
+        }
+    }
 
 }

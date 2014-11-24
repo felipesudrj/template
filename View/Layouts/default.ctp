@@ -121,8 +121,8 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 
                                     <ul class="dropdown-menu">
                                         <li><a href="/atendimento/importar">Importar ordem de serviço</a></li>
-                                        <li><a href="/atendimento/listar">Agendar Atendimento</a></li>
-                                        <li><a href="/atendimento/listar">Atribuir serviço aos técnicos</a></li>
+                                        <li><a href="/atendimento/listar/Wm1sc2RHVnlMbTV5YjNNPQ==:/Wm1sc2RHVnlMblJwY0c5VFpYSjJhV052:/Wm1sc2RHVnlMbTV2YldWRGJHbGxiblJs:/Wm1sc2RHVnlMblJsWTI1cFkyOD0=:/Wm1sc2RHVnlMbk4wWVhSMWMwRjBaVzVrYVcxbGJuUnY=:TVE9PQ%3D%3D">Agendar Atendimento</a></li>
+                                        <li><a href="/atendimento/listar/Wm1sc2RHVnlMbTV5YjNNPQ==:/Wm1sc2RHVnlMblJwY0c5VFpYSjJhV052:/Wm1sc2RHVnlMbTV2YldWRGJHbGxiblJs:/Wm1sc2RHVnlMblJsWTI1cFkyOD0=:/Wm1sc2RHVnlMbk4wWVhSMWMwRjBaVzVrYVcxbGJuUnY=:TWc9PQ%3D%3D">Atribuir serviço aos técnicos</a></li>
                                         <li><a href="/atendimento/listar">Visualizar ordens de serviço</a></li>
 
                                     </ul> 				
@@ -137,8 +137,7 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 
                                     <ul class="dropdown-menu">
                                         <li><a href="/estoque/cadastrarmaterial">Cadastrar novo item</a></li>
-                                        <li><a href="/estoque/listarmaterial">Listagem de items</a></li>
-                                        <li><a href="/estoque/relatorio">Controle de estoque</a></li>
+                                        <li><a href="/estoque/listarmaterial">Controle de estoque</a></li>
 
                                     </ul> 				
                                 </li>
@@ -153,16 +152,8 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
                                     <ul class="dropdown-menu">
                                         <li><a href="/tecnico/listar">Visualizar técnicos</a></li>
                                         <li><a href="/tecnico/cadastrar">Cadastrar novo técnico</a></li>
-
-                                        <li class="dropdown-submenu">
-                                            <a tabindex="-1" href="#">More options</a>
-                                            <ul class="dropdown-menu">
-                                                <li><a tabindex="-1" href="#">Second level</a></li>
-
-                                                <li><a href="#">Second level</a></li>
-                                                <li><a href="#">Second level</a></li>
-                                            </ul>
-                                        </li>
+                                        <li><a  href="/estoque/distribuir">Distribuição de Material</a>   </li>
+                                       
                                     </ul>    				
                                 </li>
 
@@ -176,8 +167,7 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 
                                     <ul class="dropdown-menu">
                                         <li><a href="/relatorio/atendimento">Relatório de atendimento técnico</a></li>
-                                        <li><a href="/atendimento/agendar">Relatório de estoque</a></li>
-                                        <li><a href="/relatorio/atendimento">Relatório financeiro</a></li>
+                                        <li><a href="/relatorio/equipamento">Relatório de estoque</a></li>
 
                                     </ul> 				
                                 </li>

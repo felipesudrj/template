@@ -173,7 +173,7 @@
 
         var dados = $('#form-finalizar').serialize();
         $.ajax({
-            url: '/atendimento/finalizar',
+            url: '/atendimento/ajaxFinalizar/<?php echo $atendimento['Atendimento']['atendimento_id']; ?>',
             type: 'post',
             data: dados,
             dataType: 'json',
@@ -183,11 +183,16 @@
             success: function(retorno) {
 
                 $.msgGrowl({
-                    type: 'success'
-                    , title: 'Salvo com sucesso'
-                    , text: 'Informações salvas com sucesso.'
-                    , position: 'top-right'
+                    type: retorno.tipo
+                    , title: retorno.titulo
+                    , text: retorno.msg
                 });
+                
+                if(retorno.tipo=='success'){
+                    
+                    $(window.document.location).attr('href','/atendimento/listar/');
+
+                }
 
 
             },
@@ -622,13 +627,14 @@
                                 <div class="form-group">
                                     <label for="message" class="col-lg-4">Observações de finalizacao</label>
                                     <div class="col-md-8">
-                                        <textarea class="form-control" name="message" id="observacoes-finalizar" rows="4"></textarea>
+                                        <input type="hidden" name="data[Atendimento][atendimento_id]" value="<?php echo $atendimento['Atendimento']['atendimento_id']; ?>"/>
+                                        <textarea class="form-control" name="data[Atendimento][observacoes_finaliza]" id="observacoes-finalizar" rows="4"></textarea>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <div class="col-md-offset-4 col-md-8">
-                                        <button type="button" class="btn btn-primary" onclick="finalizar()">Finalizar</button> <a href="" class="btn btn-default">Cancel</a>
+                                        <button type="button" class="btn btn-primary" onclick="ajaxFinalizar()">Finalizar</button> <a href="" class="btn btn-default">Cancel</a>
                                     </div>
                                 </div>
                             </fieldset>

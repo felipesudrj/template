@@ -113,13 +113,14 @@ if ($msg) {
 <?php foreach ($materiais as $indice => $valor) { ?>
                         <tr>
                             <td><?php echo $valor['Material']['descricao']; ?></td>
-                            <td><?php echo $valor['Material']['total']; ?></td>
+                            <td><?php echo $valor['Material']['total']; ?> (<?php echo $valor['UnidadeMedida']['descricao']; ?>)</td>
 
 
 
                             <td>
                                 <a href="/estoque/cadastrarmaterial/<?php echo $valor['Material']['material_id']; ?>" class="label label-success"><i class="icon-search"></i> Editar</a>
                                 <a href="#" onclick="excluir(this)" material_id="<?php echo $valor['Material']['material_id']; ?>" class="label msgbox-confirm label-danger"><i class="icon-remove"></i> Excluir</a>
+                                <a href="/estoque/gerenciar/<?php echo $valor['Material']['material_id']; ?>"  class="label msgbox-confirm label-warning"><i class="icon-gears"></i> Gerenciar </a>
 
                             </td>
                         </tr>

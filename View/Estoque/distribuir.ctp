@@ -1,6 +1,14 @@
+<?php $this->start('css'); ?>
+<link href="/js/plugins/msgGrowl/css/msgGrowl.css" rel="stylesheet">
+
+<?php $this->end(); ?>
+
 <?php $this->start('script'); ?>
+<script src="/js/plugins/msgGrowl/js/msgGrowl.js"></script>
+
 <script>
-function incluiritem() {
+
+    function incluiritemrat() {
 
         var materialTipo = $('#materialTipo').val();
         var materialDescricao = $('#materialTipo option:selected').text();
@@ -21,7 +29,7 @@ function incluiritem() {
                     , text: retorno.msg
                 });
 
-                VisualizaTabelaItens();
+                visualizaTabelaItens();
 
             },
             error: function() {
@@ -34,161 +42,174 @@ function incluiritem() {
         });
     }
 
-function removeitem(indice) {
+    function visualizaTabelaItens() {
+
+        $.ajax({
+            url: '/estoque/ajaxVisualizaTabelaItens',
+            type: 'post',
+            dataType: 'html',
+            success: function(retorno) {
+
+                $('#visualizaTabelaItens').html(retorno);
+
+            }
+        });
+
+
+    }
+
+    function removeitem(indice) {
 
         $.ajax({
             url: '/estoque/ajaxRemoverItem/' + indice,
             type: 'post',
-            dataType: 'html',
+            dataType: 'json',
             success: function(retorno) {
-                $.msgGrowl({
-                    type: 'success'
-                    , title: 'Removido com sucesso'
-                    , text: 'Informações salvas com sucesso.'
-                    , position: 'top-right'
-                });
-                VisualizaTabelaItens();
+                visualizaTabelaItens();
             }
         });
 
 
     }
-     
-function VisualizaTabelaItens(atendimento_id) {
-
-        $.ajax({
-            url: '/estoque/ajaxVisualizaTabelaItens/',
-            type: "POST",
-            dataType: "html",
-            success: function(retorno) {
-                $("#visualizaTabelaItens").html(retorno);
-            },
-            error: function() {
-                alert('Deu erro');
-            }
-        });
-
-
-
-    }
-
-function mostrarUnidade() {
+    
+    function mostrarUnidade() {
 
         var materialDescricao = $('#materialTipo option:selected').attr('tipoUnidade');
         $('#descTipoUnidade').html('(' + materialDescricao + ')');
 
 
 
-    }    
-	 </script>
+    }
+    visualizaTabelaItens();
 
+
+
+
+
+</script>
 <?php $this->end(); ?>
-<div class="widget stacked">
-
-      			<div class="widget-header">
-					<i class="icon-tasks"></i>
-					<h3>Distribuição de materiais </h3>
-				</div> <!-- /.widget-header -->
 
 
-				<div class="widget-content">
-
-					<form action="/estoque/distribuir" role="form"  method="post" class="form-horizontal col-md-7">
-
-						
-									
-										<div id="MostrarMateriaisDisponiveis" class="form-horizontal col-md-12">
-										<!-- LISTAR MATERIAIS  - INICIO -->
-										<div class="form-group">
-										<label for="modelo" class="col-lg-4">Tipo de Material</label>
-											<div class="col-md-8">
-											
-											 <select onclick="mostrarUnidade()" id="materialTipo"  name="material_id" class="form-control">
-												<option tipoUnidade="" selected="true" disabled="true">Selecione o tipo de material</option>
-												<?php foreach ($materiais as $indMat => $valMat) { ?>
-													<option tipoUnidade="<?php echo $valMat['Material']['UnidadeMedida']['descricao']; ?>" value="<?php echo $valMat['MaterialDistribuido']['material_id']; ?>" >
-														<?php echo $valMat['Material']['descricao']; ?>
-													</option>
-												<?php } ?>
-											</select>
-											</div>
-										</div>	
-										
-										<div class="form-group">
-										<label for="numeroserie"  class="col-lg-4">Quantidade</label>
-											<div class="col-md-8">
-											  <input type="text" name="quantidade" class="form-control" id="materialQuantidade" value="">
-											</div>
-										</div>
-										
-										<div class="form-group">
-										<label for="numeroserie" class="col-lg-4">Outras Informações</label>
-											<div class="col-md-8">
-											  <input type="text"  name="informacoes" class="form-control" id="materialInformacoes" value="">
-											</div>
-										</div>
-										
-										<div class="form-group">
-										<input type="button" class="btn btn-default pull-right" value="Incluir" onclick="incluiritem();">
-										</div>
-										
-										<hr>
-										<!-- LISTAR MATERIAIS - FIM -->
-										</div>
-									
-										<div id="visualizaTabelaItens" class="form-horizontal col-md-12">
-										<!--ELEMENTOS SALVOS NA SESSAO - INICIO -->
-										<div class="form-group">
-										<table class="table table-bordered table-hover table-striped">
-												<thead>
-												  <tr>
-													<th>#</th>
-													<th>Nome</th>
-													<th>Quantidade</th>
-													<th>Informações</th>
-													<th>Excluir</th>
-												  </tr>
-												</thead>
-												<tbody>
-												  
-												 <tr>
-												 <td colspan="5">Nenhum item na lista</td>
-												 </tr>
-												  
-												</tbody>
-										</table>
-										</div>
-										<!--ELEMENTOS SALVOS NA SESSAO - FIM -->
-										</div>
-									
-					
-						
-							<div class="form-group">
-							<label class="col-md-4">Selecione o técnico</label>
-							<div class="col-md-8">
-									<input type="select" name="Material.quantidade" required="true" value="" value="" class="form-control" />
-
-							</div>
-						</div> <!-- /.form-group -->
-						
-						
-					
-						
-							<div class="form-group">
-
-								<div class="col-md-offset-4 col-md-8">
-									<a href="/estoque/relatorioitens" class="btn btn-default">Imprimir relatório</a>
-									<button type="submit" class="btn btn-default">Salvar e sair</button>
-								</div>
-
-							</div> <!-- /.form-group -->
-
-					</form>
+<div class="col-md-12">
 
 
-				</div> <!-- /.widget-content -->
+    <div class="widget stacked">
+
+        <div class="widget-header">
+            <i class="icon-tasks"></i>
+            <h3>Distribuição de materiais </h3>
+        </div> <!-- /.widget-header -->
 
 
-      		</div> <!-- /.widget -->
+        <div class="widget-content">
 
-      
+            <div class="form-horizontal col-md-7">
+
+
+
+                <div id="MostrarMateriaisDoTecnico" class="form-horizontal col-md-12">
+                    <!-- LISTAR MATERIAIS QUE O TECNICO POSSUI - INICIO -->
+                    <div class="form-group">
+                        <label for="modelo" class="col-lg-4">Tipo de Material</label>
+                        <div class="col-md-8">
+
+                            <select id="materialTipo" onclick="mostrarUnidade()"  name="material_id" class="form-control">
+                                <option disabled="true" selected="true">Selecione um tipo de material</option>
+                                <?php foreach ($materiais as $indMat => $valMat) { ?>
+                                    <option tipoUnidade="<?php echo $valMat['UnidadeMedida']['descricao']; ?>" value="<?php echo $valMat['Material']['material_id']; ?>"><?php echo $valMat['Material']['descricao']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>	
+
+                    <div class="form-group">
+                        <label for="numeroserie"  class="col-lg-4">Quantidade <span id="descTipoUnidade"></span></label>
+                        <div class="col-md-8">
+                            <input type="text" name="quantidade" class="form-control" id="materialQuantidade" value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numeroserie" class="col-lg-4">Outras Informações</label>
+                        <div class="col-md-8">
+                            <input type="text"  name="informacoes" class="form-control" id="materialInformacoes" value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="button" class="btn btn-default pull-right" value="Incluir" onclick="incluiritemrat();">
+                    </div>
+
+                    <hr>
+                    <!-- LISTAR MATERIAIS QUE O TECNICO POSSUI - FIM -->
+                </div>
+
+                <div id="visualizaTabelaItens" class="form-horizontal col-md-12">
+                    <!--ELEMENTOS SALVOS NA SESSAO - INICIO ajaxIncluirItemRat -->
+                    <div class="form-group">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nome</th>
+                                    <th>Quantidade</th>
+                                    <th>Informações</th>
+                                    <th>Excluir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <?php foreach ($itens as $indice => $mat) { ?>
+                                    <tr>
+                                        <td><?php echo $indice; ?></td>
+                                        <td><?php echo $mat['descricao']; ?></td>
+                                        <td><?php echo $mat['quantidade']; ?></td>
+                                        <td><?php echo $mat['informacoes']; ?></td>
+                                        <td><a href="" onclick="removeitemrat('<?php echo $indice; ?>')">Remover</a></td>
+                                    </tr>
+                                <?php } ?>
+                                <tr>
+                                    <td>3</td>
+                                    <td>3</td>
+                                    <td>Larry the Bird</td>
+                                    <td>@twitter</td>
+                                    <td><a href="/atendimento/itemrat/remove/numeroitem">Remover</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--ELEMENTOS SALVOS NA SESSAO - FIM -->
+                </div>
+
+                     <?php echo $this->Form->create(); ?>
+
+                <div class="form-group">
+                    <label class="col-md-4">Selecione o técnico</label>
+                    <div class="col-md-8">
+                        <?php echo $this->Form->input('MaterialDistribuido.tecnico_id',array('empty'=>'Selecione um técnico','type'=>'select','option'=>$tecnicos,'label'=>false,'class'=>'form-control')); ?>
+
+                    </div>
+                </div> <!-- /.form-group -->
+
+
+
+
+                <div class="form-group">
+
+                    <div class="col-md-offset-4 col-md-8">
+                        <?php echo $this->Form->submit('Gravar',array('class'=>'btn btn-success')); ?>
+
+                    </div>
+
+                </div> <!-- /.form-group -->
+
+            
+            </div>
+
+
+        </div> <!-- /.widget-content -->
+
+
+    </div> <!-- /.widget -->
+
+</div> <!-- /.col-md-12 -->

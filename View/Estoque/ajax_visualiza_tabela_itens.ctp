@@ -3,7 +3,7 @@
     <table class="table table-bordered table-hover table-striped">
         <thead>
             <tr>
-                <th>#</th>
+                <th>Cod. Material</th>
                 <th>Modelo</th>
                 <th>Quantidade</th>
                 <th>Informações</th>

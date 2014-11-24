@@ -19,14 +19,21 @@ class MaterialDistribuido extends AppModel {
 				)
 			);
 	
-	/*public $virtualFields = array(
-			'totalMaterial'=>'sun(MaterialDistribuido.quantidade)'
-				);
-	public function beforeFind($query = array()) {
-		parent::beforeFind($query);
-		return $query['conditions'] = array('group'=>array('MaterialDistribuido.tecnico_id','MaterialDistribuido.material_id'));
-	
-	}		*/	
+	public $virtualFields = array(
+        'TotalDistribuido' => 'sum(MaterialDistribuido.quantidade)'
+    );
+        
+        public function totalMaterial($material_id) {
+        
+        $conditions = array(
+            'conditions'=>array('MaterialDistribuido.material_id'=>$material_id),
+            'fields'=>array('MaterialDistribuido.TotalDistribuido'),
+            'group'=>array('MaterialDistribuido.material_id'));
+        $dados = $this->find('first',$conditions);
+        
+        
+        return isset($dados['MaterialDistribuido']['TotalDistribuido'])?$dados['MaterialDistribuido']['TotalDistribuido']:'0';
+    }
 }
 
 
