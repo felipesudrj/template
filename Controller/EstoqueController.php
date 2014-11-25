@@ -98,14 +98,22 @@ class EstoqueController extends AppController {
     }
 
     public function atualizaquantidade($material_id) {
-        
+        if($this->Auth->user('tipo_usuario_id')!='1'){
+            $this->redirect(array('controller'=>'Atendimento','action'=>'tecnico'));
+        }
     }
 
     public function devolucaomaterial($tecnico_id) {
-        
+        if($this->Auth->user('tipo_usuario_id')!='1'){
+            $this->redirect(array('controller'=>'Atendimento','action'=>'tecnico'));
+        }
     }
 
     public function excluirmaterial($material_id) {
+        if($this->Auth->user('tipo_usuario_id')!='1'){
+            $this->redirect(array('controller'=>'Atendimento','action'=>'tecnico'));
+        }
+        
         try {
             $this->Material->delete($material_id);
             $this->Session->setFlash('Material excluido com sucesso', false, false, 'confirmar');
@@ -120,6 +128,10 @@ class EstoqueController extends AppController {
 
     public function distribuir() {
 
+        if($this->Auth->user('tipo_usuario_id')!='1'){
+            $this->redirect(array('controller'=>'Atendimento','action'=>'tecnico'));
+        }
+        
         $materiais = $this->Material->find('all', array());
         $tecnicos = $this->Tecnico->find('list', array('fields' => array('tecnico_id', 'nome')));
         $this->set(compact('materiais', 'tecnicos'));
@@ -245,6 +257,10 @@ class EstoqueController extends AppController {
     }
 
     public function gerenciar($material_id) {
+        if($this->Auth->user('tipo_usuario_id')!='1'){
+            $this->redirect(array('controller'=>'Atendimento','action'=>'tecnico'));
+        }
+        
         $breadcrumb = array(
             '/' => 'Painel Inicial',
             '/estoque/listarmaterial' => 'Lista de materiais',

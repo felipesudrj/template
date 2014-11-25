@@ -14,8 +14,7 @@ $msg = $this->Session->flash('negar');
 if($msg){?>			
 	<div class="alert alert-danger alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <strong>Erro!</strong> O arquivo não pode ser importado, tente novamente.
-              <br><?php echo $msg;?>
+              <strong>Erro!</strong> <?php echo $msg;?>
             </div>
 <?php }?>
 

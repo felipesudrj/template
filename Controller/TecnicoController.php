@@ -50,8 +50,8 @@ class TecnicoController extends AppController {
         $tipoUsuario = $this->TipoUsuario->find('list', array('fields' => array('tipo_usuario_id', 'descricao')));
         $this->set('tipoUsuario', $tipoUsuario);
         if (!empty($id)) {
-            $this->request->data = $this->Usuario->findByusuario_id($id);
-            pr($this->request->data);
+            $this->request->data = $this->Tecnico->findBytecnico_id($id);
+           
         }
     }
 
@@ -60,7 +60,8 @@ class TecnicoController extends AppController {
     }
 
     public function listar() {
-        
+        $tecnicos = $this->paginate('Tecnico');
+        $this->set('tecnicos',$tecnicos);
     }
 
 }
